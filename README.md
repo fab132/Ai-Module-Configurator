@@ -1,37 +1,117 @@
-🎬 AIVP – AI Video Production Configurator (Browser App)
+AIVP – AI Video Production Configurator
+Configure AI video pipelines in your browser. Select LoRA models, save combo templates, export validated JSON to ComfyUI — in under 2 minutes instead of 20.
+ Python 3.10+    NiceGUI    SQLAlchemy    SQLite    pytest 
 
-This project is intended to:
--Practice the complete process from application requirements analysis to implementation
--Apply advanced Python concepts in a browser-based application (NiceGUI)
--Demonstrate data validation, a clean architecture (presentation / application logic / persistence), and database access via ORM
--Produce clean, well-structured, and documented code (incl. tests)
--Solve a real-world bottleneck in AI video production by automating JSON configuration assembly
+Problem
+Manual JSON configuration for ComfyUI production pipelines takes ~20 minutes per order. Operators search files by hand, risk selecting incompatible models, and lack any version control or audit trail.
+Solution
+AIVP provides a browser-based interface that dynamically builds validated LoRA configurations and transfers them directly to the production pipeline — with full logging and reusable templates.
+[ Screenshots: Main UI  |  Combo Manager  |  History View ]
+Features
+•	Dynamic Layout — Add/remove LoRA columns with “+” / “−” to match each project
+•	LoRA Selector — Categorized dropdowns — no manual file searches
+•	Combo Templates — Save, load, and rename proven configurations
+•	LoRA Library — Manage all models via UI (CRUD, no file edits)
+•	Auto JSON Transfer — Validated one-click export to ComfyUI
+•	Production History — Every run logged with timestamp, customer, and config
 
-#📝 Application Requirements
+Tech Stack
+Component	Technology
+Frontend	NiceGUI (Vue.js / Quasar)
+Backend	Python 3.10+ with OOP
+Database	SQLite + SQLAlchemy ORM
+Validation	Pydantic
+Testing	pytest
+AI Tooling	Claude / GitHub Copilot
 
-###Problem
-In current AI video production, operators must manually identify and move specific JSON configuration files (representing different LoRA models) into production folders. This process is slow, lacks version control, and is highly prone to human error, such as selecting incompatible models or missing a required component for a client’s brand style.
+Quickstart
+git clone https://github.com/<your-org>/aivp-configurator.git
+cd aivp-configurator
 
-###Scenario
-The AIVP Configurator solves this by providing a dynamic interface where an operator selects the number of required AI "components" and picks specific trained LoRAs from dropdowns. Upon clicking "Go," the system validates the selection, saves the configuration to the database, and automatically moves the JSON files to the ComfyUI working directory to trigger the GPU rendering process.
+python -m venv venv
+source venv/bin/activate        # macOS / Linux
+# venv\Scripts\activate         # Windows
 
-###User stories
--As a user (Operator), I want to dynamically add or remove component columns using "+" and "−" so I can adapt the workflow to the client project.
--As a user (Operator), I want to select LoRA models from dropdowns to avoid manual filename searches.
--As a user (Operator), I want to save successful model combinations as "Combo Templates" for reuse.
--As a CTO, I want the system to move the corresponding JSON files to a defined "working folder" automatically.
--As an admin, I want to see all past production runs, ordered by date, to track volume and costs.
+pip install -r requirements.txt
+python main.py
 
-**Use cases**
+Open http://localhost:8080 in your browser.
 
--Manage Workflow Layout (Operator): Add/Remove columns dynamically.
--Configure Production (Operator): Select LoRAs and validate settings.
--Execute Run (CTO/Operator): Move JSON files and log transaction.
--Manage Templates (Operator/Product Owner): Save, Load, and Rename Combos.
--View History (Admin): Review past transactions.
+Requirements
+•	Python 3.10+
+•	Modern browser (Chrome, Firefox, Edge)
+•	No external DB setup needed (SQLite is embedded)
+•	ComfyUI working directory path configured in .env (see .env.example)
 
-**Actors**
--Operator: Builds daily configurations.
--CTO: Manages system integration and file paths.
--Admin: Oversees production history and business reporting.
+Usage
+1. Open the app → Set columns with “+” / “−”
+2. Select LoRA models from dropdowns per slot
+3. (Optional) Save the combination as a Combo Template
+4. Click “Go” → Validates, saves to DB, moves JSON to ComfyUI
+5. Production starts automatically
 
+Example
+Operator opens AIVP
+  → Adds 3 columns
+  → Selects: product_v3 + cinematic_style + brand_overlay
+  → Saves as “Client-X Standard”
+  → Clicks Go → JSON validated, logged, transferred
+  → Done in ~90 seconds
+
+Architecture
+Three-layer separation: Presentation → Application Logic → Persistence.
+
+┌──────────────────────────────────────────────┐
+│  UI Layer (NiceGUI)                          │
+│  Dynamic columns · Dropdowns · Tables        │
+├──────────────────────────────────────────────┤
+│  Service Layer (Python OOP)                  │
+│  JSON Builder · Validation · File Transfer   │
+├──────────────────────────────────────────────┤
+│  Data Layer (SQLAlchemy → SQLite)            │
+│  LoraModel · Combo · ComboItem · RunLog      │
+└──────────────────────────────────────────────┘
+        ↓ validated JSON
+  [ ComfyUI — external ]
+
+Project Structure
+aivp-configurator/
+├── main.py                  # Entry point
+├── .env.example             # Config template
+├── ui/                      # NiceGUI screens
+│   ├── main_page.py
+│   ├── lora_selector.py
+│   ├── combo_manager.py
+│   ├── history_view.py
+│   └── library_view.py
+├── services/                # Business logic
+│   ├── configurator.py
+│   ├── json_builder.py
+│   ├── file_transfer.py
+│   ├── combo_service.py
+│   ├── lora_service.py
+│   └── history_service.py
+├── models/                  # ORM entities & DB
+├── tests/                   # pytest
+├── docs/                    # Detailed documentation
+└── requirements.txt
+
+Team
+Member	Focus	Responsibilities
+Cédric Neuhaus	Product Owner & Frontend	Requirements, NiceGUI screens, coordination
+Samson Hadgu	Backend & Integration	JSON builder, file transfer, ComfyUI domain
+Fabian Eppenberger	Persistence & Testing	SQLAlchemy ORM, data model, pytest
+
+Documentation
+Detailed docs live in /docs/:
+File	Content
+docs/user-stories.md	User stories with acceptance criteria
+docs/use-cases.md	Use cases and actor definitions
+docs/architecture.md	Data model, ER diagram, design patterns
+docs/milestones.md	Sprint plan and semester milestones
+
+Context
+Academic project — Advanced Programming (BSc BIT, FHNW SS 2026). Lecturers: Prof. Dr. Phillip Gachnang & Prof. Dr. Rainer Telesko.
+License
+Academic project — FHNW, Spring Semester 2026.
+<img width="451" height="695" alt="image" src="https://github.com/user-attachments/assets/5dc44785-f41e-49c7-b42c-2b688c0e0a94" />
