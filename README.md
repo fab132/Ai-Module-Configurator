@@ -1,30 +1,58 @@
-AIVP – AI Video Production Configurator
+# AIVP – AI Video Production Configurator
+
 Configure AI video pipelines in your browser. Select LoRA models, save combo templates, export validated JSON to ComfyUI — in under 2 minutes instead of 20.
- Python 3.10+    NiceGUI    SQLAlchemy    SQLite    pytest 
 
-Problem
+![Python](https://img.shields.io/badge/python-3.10+-3776AB?logo=python&logoColor=white)
+![NiceGUI](https://img.shields.io/badge/UI-NiceGUI-2EA043)
+![SQLAlchemy](https://img.shields.io/badge/ORM-SQLAlchemy-CC3333)
+![SQLite](https://img.shields.io/badge/DB-SQLite-0F80CC)
+![pytest](https://img.shields.io/badge/tests-pytest-666666)
+
+---
+
+## Problem
+
 Manual JSON configuration for ComfyUI production pipelines takes ~20 minutes per order. Operators search files by hand, risk selecting incompatible models, and lack any version control or audit trail.
-Solution
+
+## Solution
+
 AIVP provides a browser-based interface that dynamically builds validated LoRA configurations and transfers them directly to the production pipeline — with full logging and reusable templates.
-[ Screenshots: Main UI  |  Combo Manager  |  History View ]
-Features
-•	Dynamic Layout — Add/remove LoRA columns with “+” / “−” to match each project
-•	LoRA Selector — Categorized dropdowns — no manual file searches
-•	Combo Templates — Save, load, and rename proven configurations
-•	LoRA Library — Manage all models via UI (CRUD, no file edits)
-•	Auto JSON Transfer — Validated one-click export to ComfyUI
-•	Production History — Every run logged with timestamp, customer, and config
 
-Tech Stack
-Component	Technology
-Frontend	NiceGUI (Vue.js / Quasar)
-Backend	Python 3.10+ with OOP
-Database	SQLite + SQLAlchemy ORM
-Validation	Pydantic
-Testing	pytest
-AI Tooling	Claude / GitHub Copilot
+<!-- Add screenshots once UI is built:
+![Main UI](docs/images/main-ui.png)
+![Combo Manager](docs/images/combo-manager.png)
+![History View](docs/images/history-view.png)
+-->
 
-Quickstart
+---
+
+## Features
+
+- **Dynamic Layout** — Add/remove LoRA columns with "+" / "−" to match each project
+- **LoRA Selector** — Categorized dropdowns, no manual file searches
+- **Combo Templates** — Save, load, and rename proven configurations
+- **LoRA Library** — Manage all models via UI (CRUD, no file edits)
+- **Auto JSON Transfer** — Validated one-click export to ComfyUI
+- **Production History** — Every run logged with timestamp, customer, and config
+
+---
+
+## Tech Stack
+
+| Component | Technology |
+|-----------|------------|
+| Frontend | [NiceGUI](https://nicegui.io/) (Vue.js / Quasar) |
+| Backend | Python 3.10+ with OOP |
+| Database | SQLite + [SQLAlchemy](https://www.sqlalchemy.org/) ORM |
+| Validation | Pydantic |
+| Testing | [pytest](https://pytest.org/) |
+| AI Tooling | Claude / GitHub Copilot |
+
+---
+
+## Quickstart
+
+```bash
 git clone https://github.com/<your-org>/aivp-configurator.git
 cd aivp-configurator
 
@@ -34,33 +62,45 @@ source venv/bin/activate        # macOS / Linux
 
 pip install -r requirements.txt
 python main.py
+```
 
-Open http://localhost:8080 in your browser.
+Open **http://localhost:8080** in your browser.
 
-Requirements
-•	Python 3.10+
-•	Modern browser (Chrome, Firefox, Edge)
-•	No external DB setup needed (SQLite is embedded)
-•	ComfyUI working directory path configured in .env (see .env.example)
+### Requirements
 
-Usage
-1. Open the app → Set columns with “+” / “−”
+- Python 3.10+
+- Modern browser (Chrome, Firefox, Edge)
+- No external DB setup needed (SQLite is embedded)
+- ComfyUI working directory path configured in `.env` (see `.env.example`)
+
+---
+
+## Usage
+
+1. Open the app → Set columns with "+" / "−"
 2. Select LoRA models from dropdowns per slot
-3. (Optional) Save the combination as a Combo Template
-4. Click “Go” → Validates, saves to DB, moves JSON to ComfyUI
+3. *(Optional)* Save the combination as a Combo Template
+4. Click **"Go"** → Validates, saves to DB, moves JSON to ComfyUI
 5. Production starts automatically
 
-Example
+### Example
+
+```
 Operator opens AIVP
   → Adds 3 columns
   → Selects: product_v3 + cinematic_style + brand_overlay
-  → Saves as “Client-X Standard”
+  → Saves as "Client-X Standard"
   → Clicks Go → JSON validated, logged, transferred
   → Done in ~90 seconds
+```
 
-Architecture
+---
+
+## Architecture
+
 Three-layer separation: Presentation → Application Logic → Persistence.
 
+```
 ┌──────────────────────────────────────────────┐
 │  UI Layer (NiceGUI)                          │
 │  Dynamic columns · Dropdowns · Tables        │
@@ -73,8 +113,11 @@ Three-layer separation: Presentation → Application Logic → Persistence.
 └──────────────────────────────────────────────┘
         ↓ validated JSON
   [ ComfyUI — external ]
+```
 
-Project Structure
+### Project Structure
+
+```
 aivp-configurator/
 ├── main.py                  # Entry point
 ├── .env.example             # Config template
@@ -95,23 +138,42 @@ aivp-configurator/
 ├── tests/                   # pytest
 ├── docs/                    # Detailed documentation
 └── requirements.txt
+```
 
-Team
-Member	Focus	Responsibilities
-Cédric Neuhaus	Product Owner & Frontend	Requirements, NiceGUI screens, coordination
-Samson Hadgu	Backend & Integration	JSON builder, file transfer, ComfyUI domain
-Fabian Eppenberger	Persistence & Testing	SQLAlchemy ORM, data model, pytest
+---
 
-Documentation
-Detailed docs live in /docs/:
-File	Content
-docs/user-stories.md	User stories with acceptance criteria
-docs/use-cases.md	Use cases and actor definitions
-docs/architecture.md	Data model, ER diagram, design patterns
-docs/milestones.md	Sprint plan and semester milestones
+## Team
 
-Context
-Academic project — Advanced Programming (BSc BIT, FHNW SS 2026). Lecturers: Prof. Dr. Phillip Gachnang & Prof. Dr. Rainer Telesko.
-License
+| Member | Focus | Responsibilities |
+|--------|-------|-----------------|
+| **Cédric Neuhaus** | Product Owner & Frontend | Requirements, NiceGUI screens, coordination |
+| **Samson Hadgu** | Backend & Integration | JSON builder, file transfer, ComfyUI domain |
+| **Fabian Eppenberger** | Persistence & Testing | SQLAlchemy ORM, data model, pytest |
+
+Every member works across all layers. Contributions are tracked via GitHub commits.
+
+---
+
+## Documentation
+
+Detailed docs live in [`/docs/`](docs/):
+
+| File | Content |
+|------|---------|
+| [`user-stories.md`](docs/user-stories.md) | User stories with acceptance criteria |
+| [`use-cases.md`](docs/use-cases.md) | Use cases and actor definitions |
+| [`architecture.md`](docs/architecture.md) | Data model, ER diagram, design patterns |
+| [`milestones.md`](docs/milestones.md) | Sprint plan and semester milestones |
+
+---
+
+## Context
+
+Academic project — **Advanced Programming** (BSc BIT, FHNW SS 2026).
+Lecturers: Prof. Dr. Phillip Gachnang & Prof. Dr. Rainer Telesko.
+
+---
+
+## License
+
 Academic project — FHNW, Spring Semester 2026.
-<img width="451" height="695" alt="image" src="https://github.com/user-attachments/assets/5dc44785-f41e-49c7-b42c-2b688c0e0a94" />
