@@ -1,4 +1,4 @@
-# AIVP – AI Video Production Configurator
+# AIVP – AI Visual Production
 
 Configure AI video pipelines in your browser. Select LoRA models, save combo templates, export validated JSON to ComfyUI — in under 2 minutes instead of 20.
 
