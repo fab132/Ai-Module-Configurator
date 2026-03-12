@@ -161,9 +161,6 @@ Detailed docs live in [`/docs/`](docs/):
 | File | Content |
 |------|---------|
 | [`user-stories.md`](docs/user-stories.md) | User stories with acceptance criteria |
-| [`use-cases.md`](docs/use-cases.md) | Use cases and actor definitions |
-| [`architecture.md`](docs/architecture.md) | Data model, ER diagram, design patterns |
-| [`milestones.md`](docs/milestones.md) | Sprint plan and semester milestones |
 
 ---
 
