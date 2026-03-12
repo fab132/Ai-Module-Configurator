@@ -121,13 +121,18 @@ Three-layer separation: Presentation → Application Logic → Persistence.
 aivp-configurator/
 ├── main.py                  # Entry point
 ├── .env.example             # Config template
+├── .gitignore               # Git exclusion file
+├── requirements.txt         # Project dependencies
 ├── ui/                      # NiceGUI screens
+│   ├── __init__.py
 │   ├── main_page.py
 │   ├── lora_selector.py
 │   ├── combo_manager.py
 │   ├── history_view.py
-│   └── library_view.py
+│   ├── library_view.py
+│   └── components/          # Reusable UI elements
 ├── services/                # Business logic
+│   ├── __init__.py
 │   ├── configurator.py
 │   ├── json_builder.py
 │   ├── file_transfer.py
@@ -135,8 +140,18 @@ aivp-configurator/
 │   ├── lora_service.py
 │   └── history_service.py
 ├── models/                  # ORM entities & DB
+│   ├── __init__.py
+│   ├── base.py
+│   ├── database.py
+│   └── entities.py
+├── utils/                   # Shared utilities
+│   ├── __init__.py
+│   ├── helpers.py
+│   └── validators.py
 ├── tests/                   # pytest
+│   └── __init__.py
 ├── docs/                    # Detailed documentation
+│   └── development.md
 └── requirements.txt
 ```
 
