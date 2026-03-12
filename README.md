@@ -146,9 +146,9 @@ aivp-configurator/
 
 | Member | Focus | Responsibilities |
 |--------|-------|-----------------|
-| **Cédric Neuhaus** | Product Owner & Frontend | Requirements, NiceGUI screens, coordination |
-| **Samson Hadgu** | Backend & Integration | JSON builder, file transfer, ComfyUI domain |
-| **Fabian Eppenberger** | Persistence & Testing | SQLAlchemy ORM, data model, pytest |
+| **Cédric Neuhaus** | Frontend & UI/UX Logic| Developing interactive NiceGUI components, managing client-state, and implementing user feedback loops. |
+| **Samson Hadgu** | Backend & API Integration | Building the JSON processing engine, managing file I/O operations, and integrating the ComfyUI API. |
+| **Fabian Eppenberger** | System Architecture & QA | Designing the SQLAlchemy data model (ORM), managing the database schema, and implementing automated testing (pytest). |
 
 Every member works across all layers. Contributions are tracked via GitHub commits.
 
