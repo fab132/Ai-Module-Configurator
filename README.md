@@ -1,193 +1,296 @@
 # AIVP – AI Visual Production
 
-Configure AI video pipelines in your browser. Select LoRA models, save combo templates, export validated JSON to ComfyUI — in under 2 minutes instead of 20.
+> Screenshot wird ergänzt sobald die UI fertig ist.
 
-![Python](https://img.shields.io/badge/python-3.10+-3776AB?logo=python&logoColor=white)
-![NiceGUI](https://img.shields.io/badge/UI-NiceGUI-2EA043)
-![SQLAlchemy](https://img.shields.io/badge/ORM-SQLAlchemy-CC3333)
-![SQLite](https://img.shields.io/badge/DB-SQLite-0F80CC)
-![pytest](https://img.shields.io/badge/tests-pytest-666666)
+<!-- ![UI Showcase](docs/ui-images/ui_showcase.png) -->
 
 ---
 
-## Problem
+This project is intended to:
 
-Manual JSON configuration for ComfyUI production pipelines takes ~20 minutes per order. Operators search files by hand, risk selecting incompatible models, and lack any version control or audit trail.
-
-## Solution
-
-AIVP provides a browser-based interface that dynamically builds validated LoRA configurations and transfers them directly to the production pipeline — with full logging and reusable templates.
-
-<!-- Add screenshots once UI is built:
-![Main UI](docs/images/main-ui.png)
-![Combo Manager](docs/images/combo-manager.png)
-![History View](docs/images/history-view.png)
--->
+- Practice the complete process from **application requirements analysis to implementation**
+- Apply advanced **Python** concepts in a browser-based application (NiceGUI)
+- Demonstrate **data validation**, a clean architecture (presentation / application logic / persistence), and **database access via ORM**
+- Produce clean, well-structured, and documented code (incl. tests)
+- Prepare students for **teamwork and professional documentation**
 
 ---
 
-## Features
-
-- **Dynamic Layout** — Add/remove LoRA columns with "+" / "−" to match each project
-- **LoRA Selector** — Categorized dropdowns, no manual file searches
-- **Combo Templates** — Save, load, and rename proven configurations
-- **LoRA Library** — Manage all models via UI (CRUD, no file edits)
-- **Auto JSON Transfer** — Validated one-click export to ComfyUI
-- **Production History** — Every run logged with timestamp, customer, and config
+## 📝 Application Requirements
 
 ---
 
-## Tech Stack
+### Problem
 
-| Component | Technology |
-|-----------|------------|
-| Frontend | [NiceGUI](https://nicegui.io/) (Vue.js / Quasar) |
-| Backend | Python 3.10+ with OOP |
-| Database | SQLite + [SQLAlchemy](https://www.sqlalchemy.org/) ORM |
-| Validation | Pydantic |
-| Testing | [pytest](https://pytest.org/) |
-| AI Tooling | Claude / GitHub Copilot |
+In AI content production with ComfyUI, configuring each run requires manually editing JSON files, selecting compatible LoRA models, and setting sampler parameters by hand. For a team with mixed technical backgrounds, this process takes up to 20 minutes per run and is highly error-prone — especially when switching between personas, platforms, or formats.
 
 ---
 
-## Quickstart
+### Scenario
 
-```bash
-git clone https://github.com/<your-org>/aivp-configurator.git
-cd aivp-configurator
-
-python -m venv venv
-source venv/bin/activate        # macOS / Linux
-# venv\Scripts\activate         # Windows
-
-pip install -r requirements.txt
-python main.py
-```
-
-Open **http://localhost:8080** in your browser.
-
-### Requirements
-
-- Python 3.10+
-- Modern browser (Chrome, Firefox, Edge)
-- No external DB setup needed (SQLite is embedded)
-- ComfyUI working directory path configured in `.env` (see `.env.example`)
+AIVP solves this by providing a browser-based configuration interface. The operator selects 8 parameters (Person, Content-Type, Platform, Format, Scenery, Outfit, Lighting, Perspective), each backed by a JSON config file. On clicking **Run**, the app merges all configs into a complete ComfyUI workflow and sends it directly to the ComfyUI API. Every run is logged with timestamp, settings, and customer info.
 
 ---
 
-## Usage
+### User Stories
 
-1. Open the app → Set columns with "+" / "−"
-2. Select LoRA models from dropdowns per slot
-3. *(Optional)* Save the combination as a Combo Template
-4. Click **"Go"** → Validates, saves to DB, moves JSON to ComfyUI
-5. Production starts automatically
-
-### Example
-
-```
-Operator opens AIVP
-  → Adds 3 columns
-  → Selects: product_v3 + cinematic_style + brand_overlay
-  → Saves as "Client-X Standard"
-  → Clicks Go → JSON validated, logged, transferred
-  → Done in ~90 seconds
-```
+1. As an operator, I want to select a persona and content parameters from dropdowns so I can configure a run without editing JSON manually.
+2. As an operator, I want to click **Run** and have the workflow sent to ComfyUI automatically.
+3. As an operator, I want to save a parameter combination as a Combo Template so I can reuse it for repeat customers.
+4. As an operator, I want to see a history of all past runs with their settings and timestamps.
+5. As an admin, I want to manage the LoRA model library via the UI (add, edit, delete entries).
 
 ---
 
-## Architecture
+### Use Cases
 
-Three-layer separation: Presentation → Application Logic → Persistence.
+<!-- ![UML Use Case Diagram](docs/architecture-diagrams/uml_use_case_diagram.png) -->
+> Diagram wird ergänzt.
+
+**Use Cases**
+- Configure Run (Operator) — select 8 parameters and trigger workflow
+- Save Combo Template (Operator) — store a named parameter set
+- Load Combo Template (Operator) — apply a saved set to the form
+- View Run History (Operator) — browse past runs
+- Manage LoRA Library (Admin) — CRUD on LoRA model entries
+
+**Actors**
+- Operator (configures and triggers runs)
+- Admin (manages model library)
+
+---
+
+### Wireframes / Mockups
+
+<!-- ![Wireframe – Main](docs/ui-images/wireframe_main.png) -->
+> Wireframes werden ergänzt.
+
+---
+
+## 🏛️ Architecture
+
+---
+
+### Software Architecture
+
+<!-- ![UML Class Diagram](docs/architecture-diagrams/uml_class_architecture.png) -->
+> Diagramm wird ergänzt.
+
+**Layers / Components:**
+- **UI** (NiceGUI pages and components — browser as thin client)
+- **Services** (business logic: JSON builder, file transfer, combo/lora/history services)
+- **Persistence** (SQLite + SQLAlchemy ORM entities)
+
+**Design Decisions:**
+- Three-layer separation: Presentation → Services → Persistence
+- UI never accesses the DB directly — always via service layer
+- Business rules (JSON merge, validation) are testable without starting the UI
+- ComfyUI API call is isolated in `file_transfer.py` (Adapter pattern)
+
+**Design Patterns:**
+- MVC (Model–View–Controller)
+- Repository/Service for database access (`*_service.py`)
+- Adapter for external ComfyUI API (`file_transfer.py`)
 
 ```
 ┌──────────────────────────────────────────────┐
 │  UI Layer (NiceGUI)                          │
-│  Dynamic columns · Dropdowns · Tables        │
+│  8 Dropdowns · Run Button · History Table    │
 ├──────────────────────────────────────────────┤
 │  Service Layer (Python OOP)                  │
-│  JSON Builder · Validation · File Transfer   │
+│  JSON Builder · Validation · API Transfer    │
 ├──────────────────────────────────────────────┤
 │  Data Layer (SQLAlchemy → SQLite)            │
 │  LoraModel · Combo · ComboItem · RunLog      │
 └──────────────────────────────────────────────┘
         ↓ validated JSON
-  [ ComfyUI — external ]
+  [ ComfyUI API — external ]
 ```
 
-### Project Structure
+---
 
-```
-aivp-configurator/
-├── main.py                  # Entry point
-├── .env.example             # Config template
-├── .gitignore               # Git exclusion file
-├── requirements.txt         # Project dependencies
-├── ui/                      # NiceGUI screens
-│   ├── __init__.py
+### 🗄️ Database and ORM
+
+<!-- ![ER Diagram](docs/architecture-diagrams/er_diagram.png) -->
+> ER-Diagramm wird ergänzt.
+
+**Entities:**
+
+- `LoraModel` — represents a single LoRA model with name, category, and file path
+- `Combo` — a named template grouping multiple LoRA selections
+- `ComboItem` — one slot within a Combo (references a LoraModel + slot index + weight)
+- `RunLog` — immutable log entry for each production run (customer, config JSON, timestamp)
+
+`Combo` ↔ `ComboItem` is a one-to-many relationship with cascade delete. `ComboItem` ↔ `LoraModel` is many-to-one.
+
+---
+
+## ✅ Project Requirements
+
+---
+
+### 1. Browser-based App (NiceGUI)
+
+The application runs entirely in the browser via NiceGUI. Users can:
+
+- Select 8 production parameters via dropdowns
+- Trigger a ComfyUI workflow with one click
+- Save and load Combo Templates
+- Browse run history
+- Manage the LoRA model library (CRUD)
+
+**Architecture note:** the browser is a thin client; all UI state and business logic run server-side in the NiceGUI app.
+
+---
+
+### 2. Data Validation
+
+All inputs are validated before a run is triggered:
+- All 8 parameter dropdowns must have a selection
+- Combo names must be unique and non-empty
+- LoRA model entries are validated via Pydantic schemas before DB insert
+
+---
+
+### 3. Database Management
+
+All data is managed via SQLAlchemy ORM (SQLite). Entities: `LoraModel`, `Combo`, `ComboItem`, `RunLog`. Database is initialized automatically on startup via `init_db()`.
+
+---
+
+## ⚙️ Implementation
+
+---
+
+### Technology
+
+- Python 3.10+
+- NiceGUI (browser-based UI)
+- SQLAlchemy (ORM)
+- Pydantic (validation)
+- pytest (testing)
+- python-dotenv (configuration)
+
+---
+
+### 📂 Repository Structure
+
+```text
+Ai-Module-Configurator/
+├── README.md
+├── requirements.txt
+├── .env.example               # DATABASE_URL + COMFYUI_OUTPUT_PATH
+├── .gitignore
+├── main.py                    # Entry point
+│
+├── docs/
+│   ├── ui-images/             # Screenshots and wireframes
+│   └── architecture-diagrams/ # UML and ER diagrams
+│
+├── ui/                        # NiceGUI pages
 │   ├── main_page.py
 │   ├── lora_selector.py
 │   ├── combo_manager.py
 │   ├── history_view.py
 │   ├── library_view.py
-│   └── components/          # Reusable UI elements
-├── services/                # Business logic
-│   ├── __init__.py
+│   └── components/
+│
+├── services/                  # Business logic
 │   ├── configurator.py
 │   ├── json_builder.py
 │   ├── file_transfer.py
 │   ├── combo_service.py
 │   ├── lora_service.py
 │   └── history_service.py
-├── models/                  # ORM entities & DB
-│   ├── __init__.py
+│
+├── models/                    # ORM entities & DB setup
 │   ├── base.py
 │   ├── database.py
 │   └── entities.py
-├── utils/                   # Shared utilities
-│   ├── __init__.py
-│   ├── helpers.py
-│   └── validators.py
-├── tests/                   # pytest
-│   └── __init__.py
-├── docs/                    # Detailed documentation
-│   └── development.md
-└── requirements.txt
+│
+├── utils/                     # Validators and helpers
+│   ├── validators.py
+│   └── helpers.py
+│
+├── data/                      # SQLite database (gitignored)
+└── tests/                     # pytest
 ```
 
 ---
 
-## Team
+### How to Run
 
-| Member | Focus | Responsibilities |
-|--------|-------|-----------------|
-| **Cédric Neuhaus** | Frontend & UI/UX Logic| Developing interactive NiceGUI components, managing client-state, and implementing user feedback loops. |
-| **Samson Hadgu** | Backend & API Integration | Building the JSON processing engine, managing file I/O operations, and integrating the ComfyUI API. |
-| **Fabian Eppenberger** | System Architecture & QA | Designing the SQLAlchemy data model (ORM), managing the database schema, and implementing automated testing (pytest). |
+#### 1. Project Setup
 
-Every member works across all layers. Contributions are tracked via GitHub commits.
+```bash
+python3 -m venv venv
+source venv/bin/activate      # macOS / Linux
+# venv\Scripts\activate       # Windows
+
+pip install -r requirements.txt
+```
+
+#### 2. Configuration
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and set `COMFYUI_OUTPUT_PATH` to your local ComfyUI input directory.
+
+#### 3. Launch
+
+```bash
+python main.py
+```
+
+Open the URL shown in the console (default: http://localhost:8080).
+
+#### 4. Usage
+
+Configure a run:
+1. Open the app — the main page shows 8 parameter dropdowns.
+2. Select values for Person, Content-Type, Platform, Format, Scenery, Outfit, Lighting, Perspective.
+3. *(Optional)* Save the selection as a Combo Template for reuse.
+4. Click **Run** → config is validated, logged, and sent to ComfyUI.
+
+<!-- ![UI – Main](docs/ui-images/ui_main.png) -->
 
 ---
 
-## Documentation
+## 🧪 Testing
 
-Detailed docs live in [`/docs/`](docs/):
+**Types:**
+- Unit tests: JSON builder logic, validators
+- Integration tests: ORM mappings and queries against a test SQLite DB
 
-| File | Content |
-|------|---------|
-| [`user-stories.md`](docs/user-stories.md) | User stories with acceptance criteria |
-| [`user-stories.md`](docs/use-cases.md) | Use cases and actor definitions |
-| [`user-stories.md`](docs/architecture.md) | Data model, ER diagram, design patterns |
-| [`user-stories.md`](docs/milestones.md) | Sprint plan and semester milestones |
----
-
-## Context
-
-Academic project — **Advanced Programming** (BSc BIT, FHNW SS 2026).
-Lecturers: Prof. Dr. Phillip Gachnang & Prof. Dr. Rainer Telesko.
+**Run:**
+```bash
+pytest
+```
 
 ---
 
-## License
+### Libraries Used
 
-Academic project — FHNW, Spring Semester 2026.
+- nicegui
+- sqlalchemy
+- pydantic
+- python-dotenv
+- pytest
+
+---
+
+## 👥 Team & Contributions
+
+| Name | Contribution |
+|------|--------------|
+| Cédric Neuhaus | NiceGUI UI, component design, client-state management |
+| Samson Hadgu | JSON builder, ComfyUI API integration, file transfer |
+| Fabian Eppenberger | SQLAlchemy ORM, database schema, pytest tests |
+
+---
+
+## 📝 License
+
+Academic project — FHNW, Advanced Programming, BSc BIT, Spring Semester 2026.
