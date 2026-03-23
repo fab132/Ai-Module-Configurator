@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, UTC
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from models.base import Base
@@ -20,7 +20,7 @@ class Combo(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False, unique=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
 
     items = relationship("ComboItem", back_populates="combo", cascade="all, delete-orphan")
 
@@ -45,4 +45,4 @@ class RunLog(Base):
     customer = Column(String, nullable=False)
     combo_name = Column(String)
     config_json = Column(String, nullable=False)
-    ran_at = Column(DateTime, default=datetime.utcnow)
+    ran_at = Column(DateTime, default=lambda: datetime.now(UTC))
