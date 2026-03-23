@@ -2,7 +2,8 @@
 
 > Screenshot wird ergänzt sobald die UI fertig ist.
 
-<!-- ![UI Showcase](docs/ui-images/ui_showcase.png) -->
+<img width="1037" height="583" alt="Bildschirmfoto 2026-03-23 um 23 32 54" src="https://github.com/user-attachments/assets/b3554ef8-8582-4bae-9138-e36fa12df840" />
+
 
 ---
 
