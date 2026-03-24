@@ -283,6 +283,31 @@ We test the three core layers of the application: business logic (unit), databas
 
 
 ---
+**TC_001**
+1. Test case ID: TC_001
+2. Title: JSON builder merges all 8 parameter configs into one valid workflow
+3. Preconditions: 8 mock JSON config files exist (one per parameter)
+4. Test steps: **Arrange** — prepare 8 minimal JSON stubs, one per parameter. **Act** — call `json_builder.build(params)` with all 8 parameters. **Assert** — verify the returned dict contains all keys from all 8 stubs
+5. Test data: One minimal JSON stub per parameter (Person, Content-Type, Platform, Format, Scenery, Outfit, Lighting, Perspective)
+6. Expected result: Returns a single merged dict containing all keys from all 8 configs
+7. Actual result: —
+8. Status: —
+9. Comments: Happy path — core merge logic; no DB or API required
+
+---
+
+**TC_002**
+1. Test case ID: TC_002
+2. Title: JSON builder raises `FileNotFoundError` when a parameter config file is missing
+3. Preconditions: 7 of 8 config files exist; one is intentionally absent
+4. Test steps: **Arrange** — provide 7 valid stubs, omit one file. **Act** — call `json_builder.build(params)` inside `pytest.raises(FileNotFoundError)`. **Assert** — exception is raised and no partial result is returned
+5. Test data: 7 valid stubs, 1 missing file path
+6. Expected result: Raises `FileNotFoundError` — builder fails loudly, not silently
+7. Actual result: —
+8. Status: —
+9. Comments: Exception edge case — uses `pytest.raises()` to assert the correct exception type
+
+---
 
 ### Libraries Used
 
