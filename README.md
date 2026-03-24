@@ -272,34 +272,34 @@ We test the three core layers of the application: business logic (unit), databas
 **Template for writing test cases:**
 
 1. Test case ID – unique identifier (e.g., TC_001)
----
 2. Test case title/description – What is the test about?
----
 3. Preconditions: Requirements before executing the test
----
 4. Test steps: Actions to perform
----
 5. Test data/input
----
 6. Expected result
----
 7. Actual result
----
 8. Status – pass or fail
----
 9. Comments – Additional notes or defect found
 
 
 ---
 **TC_001**
 1. Test case ID: TC_001
+---
 2. Title: JSON builder merges all 8 parameter configs into one valid workflow
+---
 3. Preconditions: 8 mock JSON config files exist (one per parameter)
+---
 4. Test steps: **Arrange** — prepare 8 minimal JSON stubs, one per parameter. **Act** — call `json_builder.build(params)` with all 8 parameters. **Assert** — verify the returned dict contains all keys from all 8 stubs
+---
 5. Test data: One minimal JSON stub per parameter (Person, Content-Type, Platform, Format, Scenery, Outfit, Lighting, Perspective)
+---
 6. Expected result: Returns a single merged dict containing all keys from all 8 configs
+---
 7. Actual result: —
+---
 8. Status: —
+---
 9. Comments: Happy path — core merge logic; no DB or API required
 
 ---
