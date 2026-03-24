@@ -291,9 +291,9 @@ We test the three core layers of the application: business logic (unit), databas
 3. Preconditions: 8 mock JSON config files exist (one per parameter)
 ---
 4. Test steps:
-               **Arrange** — prepare 8 minimal JSON stubs, one per parameter.
-               **Act** — call `json_builder.build(params)` with all 8 parameters.
-               **Assert** — verify the returned dict contains all keys from all 8 stubs
+- **Arrange** — prepare 8 minimal JSON stubs, one per parameter.
+- **Act** — call `json_builder.build(params)` with all 8 parameters.
+- **Assert** — verify the returned dict contains all keys from all 8 stubs
 ---
 5. Test data: One minimal JSON stub per parameter (Person, Content-Type, Platform, Format, Scenery, Outfit, Lighting, Perspective)
 ---
