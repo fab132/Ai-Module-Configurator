@@ -289,7 +289,7 @@ We test the three core layers of the application: business logic (unit), databas
 | **Test case ID** | TC_001 |
 | **Test case title/description** |  JSON builder merges all 8 parameter configs into one valid workflow |
 | **Preconditions** | 8 mock JSON config files exist (one per parameter) |
-| **Test steps** | 1 **Arrange** — prepare 8 minimal JSON stubs, one per parameter. , 2 **Act** — call `json_builder.build(params)` with all 8 parameters. , 3 **Assert** — verify the returned dict contains all keys from all 8 stubs |
+| **Test steps** | 1 **Arrange** — prepare 8 minimal JSON stubs, one per parameter. <br/> 2 **Act** — call `json_builder.build(params)` with all 8 parameters. <br/> 3 **Assert** — verify the returned dict contains all keys from all 8 stubs |
 | **Test data** | One minimal JSON stub per parameter (Person, Content-Type, Platform, Format, Scenery, Outfit, Lighting, Perspective) |
 | **Expected result** | Returns a single merged dict containing all keys from all 8 configs |
 | **Actual result** |  — |
