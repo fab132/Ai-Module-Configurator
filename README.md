@@ -261,14 +261,26 @@ Configure a run:
 
 ## 🧪 Testing
 
-**Types:**
-- Unit tests: JSON builder logic, validators
-- Integration tests: ORM mappings and queries against a test SQLite DB
+We test the three core layers of the application: business logic (unit), database persistence (DB), and the end-to-end run pipeline (integration). Each test follows the AAA pattern (Arrange → Act → Assert) and covers both happy paths and edge cases as taught in the course.
 
-**Run:**
-```bash
-pytest
-```
+**Test mix:**
+- Overall 14 tests
+- 8 Unit tests: e.g. JSON merge with all 8 parameters, missing config file raises `FileNotFoundError`, malformed JSON config raises error (edge case), valid parameter set passes validation, incomplete parameter set raises `ValidationError`, empty LoRA name raises `ValidationError`, LoRA weight of `0.0` raises `ValidationError` (edge case), duplicate combo name rejected
+- 3 DB tests: e.g. LoRA query returns seeded models, saving a Combo persists Combo + ComboItems, empty DB returns empty run history
+- 3 Integration tests: e.g. full run with valid params creates RunLog entry, run with missing param is blocked before API call, saving and reloading a Combo Template restores full parameter set
+
+**Template for writing test cases:**
+
+1. Test case ID – unique identifier (e.g., TC_001)
+2. Test case title/description – What is the test about?
+3. Preconditions: Requirements before executing the test
+4. Test steps: Actions to perform
+5. Test data/input
+6. Expected result
+7. Actual result
+8. Status – pass or fail
+9. Comments – Additional notes or defect found
+
 
 ---
 
