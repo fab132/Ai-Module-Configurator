@@ -1,6 +1,0 @@
-{
-  "name": "lis",
-  "checkpoint": "lis_v1.safetensors",
-  "loras": [],
-  "prompt_prefix": "photo of lis, "
-}

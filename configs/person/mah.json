@@ -1,6 +1,0 @@
-{
-  "name": "mah",
-  "checkpoint": "mah_v1.safetensors",
-  "loras": [],
-  "prompt_prefix": "photo of mah, "
-}

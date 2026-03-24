@@ -16,29 +16,29 @@ PARAMS = [
 def create_configurator():
     selections: dict[str, ui.select] = {}
 
-    with ui.element("div").classes("p-6 w-full max-w-6xl mx-auto"):
+    with ui.element("div").classes("p-10 w-full max-w-7xl mx-auto"):
 
         ui.label("Configure your run").classes(
-            "text-white text-xl font-semibold mb-6 block tracking-wide"
+            "text-white text-2xl font-semibold mb-8 block tracking-wide"
         )
 
         with ui.element("div").classes(
-            "grid grid-cols-2 gap-4 mb-8"
+            "grid grid-cols-2 gap-6 mb-10"
         ).style("grid-template-columns: repeat(4, 1fr)"):
             for key, label, icon in PARAMS:
                 options = get_options(key)
-                with ui.element("div").classes("param-card p-4 flex flex-col gap-2"):
+                with ui.element("div").classes("param-card p-6 flex flex-col gap-3"):
                     ui.label(f"{icon}  {label}").classes(
-                        "text-xs font-bold uppercase tracking-widest"
+                        "text-sm font-bold uppercase tracking-widest"
                     ).style("color: #a78bfa")
                     sel = ui.select(
                         options=options,
                         label=f"Select...",
                         with_input=True,
-                    ).classes("w-full").props("outlined dense dark color=deep-purple-3")
+                    ).classes("w-full").props("outlined dark color=deep-purple-3")
                     selections[key] = sel
 
-        with ui.row().classes("w-full justify-center mt-4"):
+        with ui.row().classes("w-full justify-center mt-6"):
             def handle_run():
                 missing = [
                     label for key, label, _ in PARAMS if not selections[key].value
@@ -60,5 +60,5 @@ def create_configurator():
                 )
 
             ui.button("⚡  RUN", on_click=handle_run).classes(
-                "run-btn text-white font-bold rounded-xl px-20 py-4 text-lg tracking-widest"
+                "run-btn text-white font-bold tracking-widest"
             )

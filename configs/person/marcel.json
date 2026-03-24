@@ -1,0 +1,7 @@
+{
+  "name": "marcel",
+  "gender": "male",
+  "checkpoint": "marcel_v1.safetensors",
+  "loras": [],
+  "prompt_prefix": "photo of marcel, man, "
+}

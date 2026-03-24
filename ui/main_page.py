@@ -7,24 +7,27 @@ CUSTOM_CSS = """
     .param-card {
         background: linear-gradient(135deg, #13132b 0%, #1a1a35 100%);
         border: 1px solid rgba(139, 92, 246, 0.25);
-        border-radius: 14px;
+        border-radius: 18px;
         transition: all 0.2s ease;
     }
     .param-card:hover {
         border-color: rgba(139, 92, 246, 0.7);
-        transform: translateY(-3px);
-        box-shadow: 0 8px 28px rgba(139, 92, 246, 0.18);
+        transform: translateY(-4px);
+        box-shadow: 0 12px 36px rgba(139, 92, 246, 0.22);
     }
 
     .run-btn {
         background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%) !important;
-        letter-spacing: 0.15em !important;
+        letter-spacing: 0.18em !important;
         transition: all 0.2s ease !important;
+        font-size: 1.25rem !important;
+        padding: 1.1rem 5rem !important;
+        border-radius: 16px !important;
     }
     .run-btn:hover {
         background: linear-gradient(135deg, #6d28d9 0%, #4338ca 100%) !important;
-        box-shadow: 0 0 40px rgba(124, 58, 237, 0.45) !important;
-        transform: scale(1.03);
+        box-shadow: 0 0 56px rgba(124, 58, 237, 0.55) !important;
+        transform: scale(1.04);
     }
 
     .aivp-header {
@@ -34,12 +37,22 @@ CUSTOM_CSS = """
 
     .q-tab--active .q-tab__label {
         color: #a78bfa !important;
+        font-size: 1rem !important;
+    }
+    .q-tab__label {
+        font-size: 1rem !important;
     }
     .q-tabs__content {
         background: transparent !important;
     }
     .q-tab-panels {
         background: transparent !important;
+    }
+    .q-select .q-field__label {
+        font-size: 1rem !important;
+    }
+    .q-select .q-field__native {
+        font-size: 1rem !important;
     }
 """
 
@@ -51,13 +64,13 @@ def create_main_page():
         ui.add_css(CUSTOM_CSS)
 
         # ── Header ──────────────────────────────────────────────────────────
-        with ui.element("div").classes("aivp-header w-full px-8 py-5"):
-            with ui.row().classes("items-center gap-3"):
-                ui.label("⚡").style("font-size: 1.8rem")
+        with ui.element("div").classes("aivp-header w-full px-10 py-7"):
+            with ui.row().classes("items-center gap-4"):
+                ui.label("⚡").style("font-size: 2.4rem")
                 with ui.column().classes("gap-0"):
-                    ui.label("AIVP").classes("text-white text-2xl font-black tracking-widest")
+                    ui.label("AIVP").classes("text-white font-black tracking-widest").style("font-size: 2rem")
                     ui.label("AI Visual Production").style(
-                        "color: #a78bfa; font-size: 0.72rem; letter-spacing: 0.2em"
+                        "color: #a78bfa; font-size: 0.85rem; letter-spacing: 0.22em"
                     )
 
         # ── Tabs ────────────────────────────────────────────────────────────
