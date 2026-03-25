@@ -275,8 +275,9 @@ Overall 15 tests
 - 4 DB tests: e.g. run history returns correct logged entries (US8), LoRA query returns seeded models, saving a Combo persists Combo + ComboItems, empty DB returns empty run history
 - 3 Integration tests: e.g. full run with valid params creates RunLog entry, run with missing param is blocked before API call, saving and reloading a Combo Template restores full parameter set
 
----
-**TC_001 — JSON Builder Happy Path**
+
+
+## TC_001 — JSON Builder Happy Path
 | Field | Details|
 |------|--------------|
 | **Test case ID** | TC_001 |
@@ -289,8 +290,9 @@ Overall 15 tests
 | **Status** | — |
 | **Comments** | Happy path — core merge logic; no DB or API required |
 
----
-**TC_002 — JSON Builder Missing Config File**
+
+
+## TC_002 — JSON Builder Missing Config File
 | Field | Details|
 |------|--------------|
 | **Test case ID** | TC_002 |
