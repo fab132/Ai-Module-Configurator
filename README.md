@@ -52,18 +52,25 @@ AIVP solves this by providing a browser-based configuration interface. The opera
 ### Use Cases
 
 <!-- ![UML Use Case Diagram](docs/architecture-diagrams/uml_use_case_diagram.png) -->
-> Diagram wird ergänzt.
+
+Diagram wird ergänzt.
 
 **Use Cases**
+- Register / Login (User) — create an account with email and password, or log in for returning access
 - Configure Run (Operator) — select 8 parameters and trigger workflow
+- Select Output Format (Operator) — choose resolution and aspect ratio before triggering a run
+- Save / Download Output (Operator) — download generated image to device or save to cloud storage
 - Save Combo Template (Operator) — store a named parameter set
 - Load Combo Template (Operator) — apply a saved set to the form
-- View Run History (Operator) — browse past runs
-- Manage LoRA Library (Admin) — CRUD on LoRA model entries
+- View Run History (Operator) — browse past runs with settings and timestamps
+- Add LoRA Model (Admin) — add a new model entry to the library
+- Edit LoRA Model (Admin) — update metadata of an existing model entry
+- Delete LoRA Model (Admin) — remove an outdated or unused model from the library
 
 **Actors**
-- Operator (configures and triggers runs)
-- Admin (manages model library)
+- User (registers and logs in)
+- Operator (configures and triggers runs, manages output)
+- Admin (manages LoRA model library)
 
 ---
 
@@ -85,14 +92,16 @@ AIVP solves this by providing a browser-based configuration interface. The opera
 
 **Layers / Components:**
 - **UI** (NiceGUI pages and components — browser as thin client)
-- **Services** (business logic: JSON builder, file transfer, combo/lora/history services)
+- **Services** (business logic: auth, JSON builder, file transfer, combo/lora/history/output services)
 - **Persistence** (SQLite + SQLAlchemy ORM entities)
 
 **Design Decisions:**
 - Three-layer separation: Presentation → Services → Persistence
 - UI never accesses the DB directly — always via service layer
+- Authentication is handled server-side via auth_service.py; passwords are never stored in plaintext
 - Business rules (JSON merge, validation) are testable without starting the UI
-- ComfyUI API call is isolated in `file_transfer.py` (Adapter pattern)
+- ComfyUI API call is isolated in file_transfer.py (Adapter pattern)
+- Output delivery (local download or cloud save) is handled in output_service.py, keeping it separate from the run pipeline
 
 **Design Patterns:**
 - MVC (Model–View–Controller)
@@ -100,18 +109,22 @@ AIVP solves this by providing a browser-based configuration interface. The opera
 - Adapter for external ComfyUI API (`file_transfer.py`)
 
 ```
-┌──────────────────────────────────────────────┐
-│  UI Layer (NiceGUI)                          │
-│  8 Dropdowns · Run Button · History Table    │
-├──────────────────────────────────────────────┤
-│  Service Layer (Python OOP)                  │
-│  JSON Builder · Validation · API Transfer    │
-├──────────────────────────────────────────────┤
-│  Data Layer (SQLAlchemy → SQLite)            │
-│  LoraModel · Combo · ComboItem · RunLog      │
-└──────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────┐
+│  UI Layer (NiceGUI)                                    │
+│  Login · Register · 8 Dropdowns · Run Button           │
+│  History Table · Output Download · LoRA Library        │
+├────────────────────────────────────────────────────────┤
+│  Service Layer (Python OOP)                            │
+│  Auth · JSON Builder · Validation · API Transfer       │
+│  Output Delivery · Combo · LoRA · History              │
+├────────────────────────────────────────────────────────┤
+│  Data Layer (SQLAlchemy → SQLite)                      │
+│  User · LoraModel · Combo · ComboItem · RunLog         │
+└────────────────────────────────────────────────────────┘
         ↓ validated JSON
   [ ComfyUI API — external ]
+        ↓ generated output
+  [ Local Download  /  Cloud Storage — external ]
 ```
 
 ---
@@ -123,12 +136,13 @@ AIVP solves this by providing a browser-based configuration interface. The opera
 
 **Entities:**
 
-- `LoraModel` — represents a single LoRA model with name, category, and file path
-- `Combo` — a named template grouping multiple LoRA selections
-- `ComboItem` — one slot within a Combo (references a LoraModel + slot index + weight)
-- `RunLog` — immutable log entry for each production run (customer, config JSON, timestamp)
+`User` — registered user with email and hashed password; anchors all run history and combo templates to an account <br/>
+`LoraModel` — represents a single LoRA model with name, category, and file path <br/>
+`Combo` — a named template grouping multiple LoRA selections; owned by a User <br/>
+`ComboItem` — one slot within a Combo (references a LoraModel + slot index + weight) <br/>
+`RunLog` — immutable log entry for each production run (user, config JSON, output format, timestamp)
 
-`Combo` ↔ `ComboItem` is a one-to-many relationship with cascade delete. `ComboItem` ↔ `LoraModel` is many-to-one.
+`User` ↔ `RunLog` is one-to-many (each run belongs to a user). `User` ↔ `Combo` is one-to-many. `Combo` ↔ `ComboItem` is one-to-many with cascade delete. `ComboItem` ↔ `LoraModel` is many-to-one.
 
 ---
 
@@ -140,28 +154,37 @@ AIVP solves this by providing a browser-based configuration interface. The opera
 
 The application runs entirely in the browser via NiceGUI. Users can:
 
+- Register a new account with email and password
+- Log in to access their personal run history and Combo Templates
 - Select 8 production parameters via dropdowns
+- Choose output format (resolution and aspect ratio) before triggering a run
 - Trigger a ComfyUI workflow with one click
+- Download the generated output to their device or save it to cloud storage
 - Save and load Combo Templates
-- Browse run history
-- Manage the LoRA model library (CRUD)
+- Browse personal run history with timestamps and settings
+- Manage the LoRA model library (add, edit, delete — admin only)
 
-**Architecture note:** the browser is a thin client; all UI state and business logic run server-side in the NiceGUI app.
+
+
+**Architecture note:** the browser is a thin client; all UI state, authentication, and business logic run server-side in the NiceGUI app.
 
 ---
 
 ### 2. Data Validation
 
 All inputs are validated before a run is triggered:
+- Email must be a valid format on registration; password must meet minimum strength requirements
 - All 8 parameter dropdowns must have a selection
+- Output format (resolution, aspect ratio) must be selected before triggering a run
 - Combo names must be unique and non-empty
 - LoRA model entries are validated via Pydantic schemas before DB insert
+- Passwords are never stored in plaintext — hashed via `bcrypt` before persisting to DB
 
 ---
 
 ### 3. Database Management
 
-All data is managed via SQLAlchemy ORM (SQLite). Entities: `LoraModel`, `Combo`, `ComboItem`, `RunLog`. Database is initialized automatically on startup via `init_db()`.
+All data is managed via SQLAlchemy ORM (SQLite). Entities: `User`, `LoraModel`, `Combo`, `ComboItem`, `RunLog`. Database is initialized automatically on startup via `init_db()`. Each user's run history and combo templates are scoped to their account via foreign key relationships.
 
 ---
 
@@ -175,6 +198,7 @@ All data is managed via SQLAlchemy ORM (SQLite). Entities: `LoraModel`, `Combo`,
 - NiceGUI (browser-based UI)
 - SQLAlchemy (ORM)
 - Pydantic (validation)
+- bcrypt (password hashing)
 - pytest (testing)
 - python-dotenv (configuration)
 
@@ -186,7 +210,7 @@ All data is managed via SQLAlchemy ORM (SQLite). Entities: `LoraModel`, `Combo`,
 Ai-Module-Configurator/
 ├── README.md
 ├── requirements.txt
-├── .env.example               # DATABASE_URL + COMFYUI_OUTPUT_PATH
+├── .env.example               # DATABASE_URL + COMFYUI_OUTPUT_PATH + CLOUD_STORAGE_URL
 ├── .gitignore
 ├── main.py                    # Entry point
 │
@@ -195,6 +219,8 @@ Ai-Module-Configurator/
 │   └── architecture-diagrams/ # UML and ER diagrams
 │
 ├── ui/                        # NiceGUI pages
+│   ├── login_page.py          # Login form (new)
+│   ├── register_page.py       # Registration form (new)
 │   ├── main_page.py
 │   ├── lora_selector.py
 │   ├── combo_manager.py
@@ -203,9 +229,11 @@ Ai-Module-Configurator/
 │   └── components/
 │
 ├── services/                  # Business logic
+│   ├── auth_service.py        # Register, login, password hashing (new)
 │   ├── configurator.py
 │   ├── json_builder.py
 │   ├── file_transfer.py
+│   ├── output_service.py      # Local download + cloud save (new)
 │   ├── combo_service.py
 │   ├── lora_service.py
 │   └── history_service.py
@@ -213,10 +241,11 @@ Ai-Module-Configurator/
 ├── models/                    # ORM entities & DB setup
 │   ├── base.py
 │   ├── database.py
-│   └── entities.py
+│   └── entities.py            # Now includes User entity
 │
 ├── utils/                     # Validators and helpers
-│   ├── validators.py
+│   ├── validators.py          # Now includes email + password validators
+│   ├── password_utils.py      # bcrypt hashing helpers (new)
 │   └── helpers.py
 │
 ├── data/                      # SQLite database (gitignored)
