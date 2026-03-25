@@ -378,6 +378,32 @@ Overall 15 tests
 | **Status** | — |
 | **Comments** | Exception case — ensures all 8 dropdowns are enforced before a run is triggered; uses `pytest.raises()` |
 
+## TC_006 — User Registration Happy Path (US1)
+| Field | Details|
+|------|--------------|
+| **Test case ID** | TC_006 |
+| **Test case title/description** | A new user can register successfully with a valid email and password |
+| **Preconditions** | DB initialized; no existing user with the test email address |
+| **Test steps** | 1. **Arrange** — prepare a valid registration payload with email and password.    <br/> 2. **Act** —call `auth_service.register(email, password)`.  <br/> 3. **Assert** — a new user record exists in the DB with the correct email and a hashed password | 
+| **Test data** | `{ email: "operator@aivp.ch", password: "SecurePass123!" }`|
+| **Expected result** | User record is created in DB; password is stored as a hash, not plaintext |
+| **Actual result** |  — |
+| **Status** | — |
+| **Comments** | Happy path for US1 — baseline registration flow; verifies password is never stored in plaintext |
+
+## TC_007 — LoRA Model Delete Removes Entry from DB (US5)
+| Field | Details|
+|------|--------------|
+| **Test case ID** | TC_007 |
+| **Test case title/description** | Deleting a LoRA model via the admin service removes it from the DB |
+| **Preconditions** | Test SQLite DB initialized; 1 `LoraModel` row seeded with a known ID |
+| **Test steps** | 1. **Arrange** — seed a `LoraModel` row and record its ID.     <br/> 2. **Act** — call `lora_service.delete(lora_id)`, then call `lora_service.get_all()`.   <br/> 3. **Assert** — the deleted model is no longer present in the returned list | 
+| **Test data** | 1 seeded `LoraModel` with `name: "TestLora", category: "Style", file_path: "/models/lora/test.safetensors"` |
+| **Expected result** | `lora_service.get_all()` returns an empty list; no exception is raised |
+| **Actual result** |  — |
+| **Status** | — |
+| **Comments** | Covers the delete operation of US5 (admin manages LoRA library); complements TC_009 which covers the read operation |
+
 
 ---
 
