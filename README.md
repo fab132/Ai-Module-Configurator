@@ -285,10 +285,12 @@ Open the URL shown in the console (default: http://localhost:8080).
 #### 4. Usage
 
 Configure a run:
-1. Open the app — the main page shows 8 parameter dropdowns.
+1. Open the app — register with your email and password, or log in if you already have an account.
 2. Select values for Person, Content-Type, Platform, Format, Scenery, Outfit, Lighting, Perspective.
-3. *(Optional)* Save the selection as a Combo Template for reuse.
-4. Click **Run** → config is validated, logged, and sent to ComfyUI.
+3. Choose the output format (resolution and aspect ratio) for the target platform.
+4. (Optional) Save the selection as a Combo Template for reuse.
+5. Click **Run** → config is validated, logged, and sent to ComfyUI.
+6. Download the generated output to your device or save it to cloud storage.
 
 <!-- ![UI – Main](docs/ui-images/ui_main.png) -->
 
@@ -300,10 +302,11 @@ We test the three core layers of the application: business logic (unit), databas
 
 **Test mix:**
 Overall 15 tests
-- 7 Unit tests: e.g. JSON merge with all 8 parameters, missing config file raises FileNotFoundError, valid parameter set passes validation, incomplete parameter set raises ValidationError, user registration with valid email and password, user login with valid credentials, edit LoRA model updates DB entry
+- 7 Unit tests: e.g. JSON merge with all 8 parameters, missing config file raises `FileNotFoundError`, valid parameter set passes validation, incomplete parameter set raises `ValidationError`, user registration with valid email and password, user login with valid credentials, edit LoRA model updates DB entry
 - 4 DB tests: e.g. run history returns correct logged entries (US8), LoRA query returns seeded models, saving a Combo persists Combo + ComboItems, empty DB returns empty run history
 - 3 Integration tests: e.g. full run with valid params creates RunLog entry, run with missing param is blocked before API call, saving and reloading a Combo Template restores full parameter set
 
+**Note** : US5 (output format selection) and US6 (download / cloud save) are outside the current test scope cap of 15 and are planned for a future test cycle.
 
 
 ## TC_001 — JSON Builder Happy Path
@@ -333,6 +336,22 @@ Overall 15 tests
 | **Actual result** |  — |
 | **Status** | — |
 | **Comments** | Exception edge case — uses `pytest.raises()` to assert the correct exception type |
+
+
+## TC_003 — Run History Returns Correct Entries (US4)
+| Field | Details|
+|------|--------------|
+| **Test case ID** | TC_003 |
+| **Test case title/description** | Run history returns all logged runs with correct data |
+| **Preconditions** | Test SQLite DB initialized; 2 `RunLog` rows seeded with known config JSON and timestamps |
+| **Test steps** | 1. **Arrange** — seed 2 `RunLog` rows with distinct config JSON and timestamps. <br/> 2. **Act** — call `history_service.get_all()`. <br/> 3. **Assert** — result is a list of exactly 2 `RunLog` objects with correct config JSON, customer info, and non-null timestamps | 
+| **Test data** | 2 run log entries with distinct timestamps and config JSON matching the valid parameter set from TC_004 |
+| **Expected result** | Returns a list of exactly 2 `RunLog` objects with correct field values in descending timestamp order |
+| **Actual result** |  — |
+| **Status** | — |
+| **Comments** | Happy path for US4 — verifies the operator can view past runs with their settings; complements the empty history edge case in TC_011 |
+
+
 
 ---
 
