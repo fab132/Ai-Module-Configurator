@@ -343,13 +343,13 @@ Overall 15 tests
 |------|--------------|
 | **Test case ID** | TC_003 |
 | **Test case title/description** | Run history returns all logged runs with correct data |
-| **Preconditions** | Test SQLite DB initialized; 2 `RunLog` rows seeded with known config JSON and timestamps |
-| **Test steps** | 1. **Arrange** — seed 2 `RunLog` rows with distinct config JSON and timestamps. <br/> 2. **Act** — call `history_service.get_all()`. <br/> 3. **Assert** — result is a list of exactly 2 `RunLog` objects with correct config JSON, customer info, and non-null timestamps | 
-| **Test data** | 2 run log entries with distinct timestamps and config JSON matching the valid parameter set from TC_004 |
-| **Expected result** | Returns a list of exactly 2 `RunLog` objects with correct field values in descending timestamp order |
+| **Preconditions** | Test SQLite DB initialized; multiple `RunLog` rows (e.g. 2) seeded with known config JSON and timestamps |
+| **Test steps** | 1. **Arrange** — seed multiple `RunLog` rows (e.g. 2) with distinct config JSON and timestamps.  <br/> 2. **Act** — call `history_service.get_all()`. <br/> 3. **Assert** — result is a list containing all seeded `RunLog` entries with correct config JSON, customer info, and non-null timestamps | 
+| **Test data** | Multiple run log entries (e.g. 2) with distinct timestamps and config JSON matching the valid parameter set from TC_004 |
+| **Expected result** | Returns a list containing all seeded `RunLog` entries with correct field values in descending timestamp order |
 | **Actual result** |  — |
 | **Status** | — |
-| **Comments** | Happy path for US4 — verifies the operator can view past runs with their settings; complements the empty history edge case in TC_011 |
+| **Comments** | Happy path for US8 — verifies the operator can view all past runs with their settings; complements the empty history edge case in TC_011 |
 
 
 
