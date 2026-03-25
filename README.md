@@ -352,6 +352,32 @@ Overall 15 tests
 | **Comments** | Happy path for US8 — verifies the operator can view all past runs with their settings; complements the empty history edge case in TC_011 |
 
 
+## TC_004 — Parameter Validator Happy Path
+| Field | Details|
+|------|--------------|
+| **Test case ID** | TC_004 |
+| **Test case title/description** | Validator accepts a fully populated valid parameter set |
+| **Preconditions** | Pydantic schema for run parameters is defined|
+| **Test steps** | 1. **Arrange** — prepare a dict with all 8 required fields set to valid string values.   <br/> 2. **Act** — instantiate the Pydantic schema with that dict.  <br/> 3. **Assert** — result is a list containing all seeded `RunLog` entries with correct config JSON, customer info, and non-null timestamps | 
+| **Test data** | `{ person: "Persona_A", content_type: "Photo", platform: "Instagram", format: "Square", scenery: "Studio", outfit: "Casual", lighting: "Soft", perspective: "Front" }`|
+| **Expected result** | Schema instantiates without raising a `ValidationError` |
+| **Actual result** |  — |
+| **Status** | — |
+| **Comments** | baseline validation test |
+
+## TC_005 — Parameter Validator Missing Field
+| Field | Details|
+|------|--------------|
+| **Test case ID** | TC_005 |
+| **Test case title/description** | Validator raises `ValidationError` when one required field is missing |
+| **Preconditions** | Pydantic schema for run parameters is defined|
+| **Test steps** | 1. **Arrange** — prepare the dict from TC_004 with the `perspective` key removed.    <br/> 2. **Act** —instantiate the schema inside `pytest.raises(ValidationError)`.  <br/> 3. **Assert** — error message references the `perspective` field. | 
+| **Test data** | Same as TC_004 but `perspective` key removed|
+| **Expected result** | Raises `ValidationError` identifying the missing field by name |
+| **Actual result** |  — |
+| **Status** | — |
+| **Comments** | Exception case — ensures all 8 dropdowns are enforced before a run is triggered; uses `pytest.raises()` |
+
 
 ---
 
