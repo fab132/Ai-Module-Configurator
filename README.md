@@ -404,6 +404,57 @@ Overall 15 tests
 | **Status** | — |
 | **Comments** | Covers the delete operation of US5 (admin manages LoRA library); complements TC_009 which covers the read operation |
 
+## TC_008 — User Login Happy Path (US2)
+| Field | Details|
+|------|--------------|
+| **Test case ID** | TC_008 |
+| **Test case title/description** | A registered user can log in successfully with correct credentials |
+| **Preconditions** | DB initialized; a user with `email: "operator@aivp.ch"` is already registered |
+| **Test steps** | 1. **Arrange** — seed a registered user in the DB.     <br/> 2. **Act** — call `auth_service.login(email, password)`.   <br/> 3. **Assert** — a valid session token or success response is returned | 
+| **Test data** | `{ email: "operator@aivp.ch", password: "SecurePass123!" }` |
+| **Expected result** | Login succeeds and returns a valid session token; no exception is raised |
+| **Actual result** |  — |
+| **Status** | — |
+| **Comments** | Happy path for US2 — verifies returning users can authenticate; complements TC_006 registration flow |
+
+## TC_009 — LoRA Library DB Query
+| Field | Details|
+|------|--------------|
+| **Test case ID** | TC_009 |
+| **Test case title/description** | LoRA query returns all seeded models |
+| **Preconditions** | Test SQLite DB initialized with `init_db()`; 3 `LoraModel` rows seeded |
+| **Test steps** | 1. **Arrange** — seed 3 `LoraModel` rows with distinct names and categories.     <br/> 2. **Act** — call `lora_service.get_all()`.   <br/> 3. **Assert** — result is a list of exactly 3 `LoraModel` objects with correct field values | 
+| **Test data** | 3 seeded models with distinct names and categories |
+| **Expected result** | Returns a list of exactly 3 `LoraModel` objects with correct field values |
+| **Actual result** |  — |
+| **Status** | — |
+| **Comments** | Verifies ORM mapping and seed data integrity |
+
+## TC_010 — Combo Persistence with ComboItems
+| Field | Details|
+|------|--------------|
+| **Test case ID** | TC_010 |
+| **Test case title/description** | Saving a Combo with ComboItems persists the full relationship |
+| **Preconditions** | Test SQLite DB initialized; at least 2 `LoraModel` rows exist |
+| **Test steps** | 1. **Arrange** — create a `Combo` object with 2 `ComboItems` referencing existing models.     <br/> 2. **Act** — call `combo_service.save(combo)`, then re-query the combo by name.    <br/> 3. **Assert** — queried combo has 2 items with correct `lora_model_id` and `weight` values | 
+| **Test data** | Combo name: `"TestCombo"`, 2 items with weights `0.8` and `0.6` |
+| **Expected result** | Queried combo has 2 items with correct `lora_model_id` and `weight` values |
+| **Actual result** |  — |
+| **Status** | — |
+| **Comments** | Tests one-to-many cascade and foreign key integrity |
+
+## TC_011 — Empty Run History (Edge Case)
+| Field | Details|
+|------|--------------|
+| **Test case ID** | TC_011 |
+| **Test case title/description** | RunLog query on empty DB returns empty list (edge case) |
+| **Preconditions** | Test SQLite DB initialized with no `RunLog` rows |
+| **Test steps** | 1. **Arrange** — initialize a clean test DB with no run history.     <br/> 2. **Act** — call `history_service.get_all()`.    <br/> 3. **Assert** — result is `[]` and no exception is raised | 
+| **Test data** | Empty DB |
+| **Expected result** | Returns `[]` without raising an exception |
+| **Actual result** |  — |
+| **Status** | — |
+| **Comments** | ensures the history view does not crash on first launch before any runs |
 
 ---
 
