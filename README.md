@@ -456,6 +456,33 @@ Overall 15 tests
 | **Status** | — |
 | **Comments** | ensures the history view does not crash on first launch before any runs |
 
+
+## TC_012 — Full Run Pipeline Happy Path
+| Field | Details|
+|------|--------------|
+| **Test case ID** | TC_012 |
+| **Test case title/description** | Full run with valid params creates a RunLog entry |
+| **Preconditions** | DB initialized; ComfyUI API call mocked with `unittest.mock.patch` to return HTTP 200 |
+| **Test steps** | 1. **Arrange** — prepare a valid 8-parameter set and mock the ComfyUI API.     <br/> 2. **Act** — call `configurator.run(params)`.    <br/> 3. **Assert** — exactly 1 `RunLog` row exists with correct config JSON and a non-null timestamp | 
+| **Test data** | Same valid set as TC_004 |
+| **Expected result** | Exactly 1 `RunLog` row exists with correct config JSON and non-null timestamp |
+| **Actual result** |  — |
+| **Status** | — |
+| **Comments** | Happy path — covers the full pipeline: validate → build JSON → send → log |
+
+## TC_013 — Invalid Run Blocked Before API Call
+| Field | Details|
+|------|--------------|
+| **Test case ID** | TC_013 |
+| **Test case title/description** | Run with a missing parameter is blocked before the API call is made |
+| **Preconditions** | DB initialized; ComfyUI API mocked to detect whether it was called |
+| **Test steps** | 1. **Arrange** — prepare a parameter set with `perspective` missing and set up the API mock.      <br/> 2. **Act** — call `configurator.run(params)` inside `pytest.raises(ValidationError)`.    <br/> 3. **Assert** — `ValidationError` is raised, API mock call count is `0`, and no `RunLog` row was created | 
+| **Test data** | Same as TC_005 (missing `perspective`) |
+| **Expected result** | `ValidationError` raised; API mock never called; no `RunLog` row created |
+| **Actual result** |  — |
+| **Status** | — |
+| **Comments** | Exception integration case — ensures invalid input is blocked end-to-end before touching external systems; uses `pytest.raises()` |
+
 ---
 
 ### Libraries Used
