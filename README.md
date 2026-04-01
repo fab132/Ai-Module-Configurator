@@ -483,6 +483,33 @@ Overall 15 tests
 | **Status** | — |
 | **Comments** | Exception integration case — ensures invalid input is blocked end-to-end before touching external systems; uses `pytest.raises()` |
 
+## TC_014 — Combo Template Save and Reload Cycle
+| Field | Details|
+|------|--------------|
+| **Test case ID** | TC_014 |
+| **Test case title/description** | Saving and reloading a Combo Template restores the full parameter set |
+| **Preconditions** | DB initialized; at least 2 'LoraModel' rows seeded |
+| **Test steps** | 1. **Arrange** — prepare a 'Combo' with 2 items at known weights and slot indices.      <br/> 2. **Act** — call 'combo_service.save(combo)', then reload via 'combo_service.get_by_name("TestCombo")'.    <br/> 3. **Assert** — reloaded combo has identical name, item count, weights, and slot indices | 
+| **Test data** | Combo with 2 items, weights '0.8' and '0.6', slot indices '0' and '1' |
+| **Expected result** | Reloaded combo has identical name, item count, weights and slot indices as saved |
+| **Actual result** |  — |
+| **Status** | — |
+| **Comments** | Validates the full save → persist → reload cycle used by operators for repeat runs |
+
+
+## TC_015 — Edit LoRA Model Updates DB Entry (US10)
+| Field | Details|
+|------|--------------|
+| **Test case ID** | TC_015 |
+| **Test case title/description** | Editing an existing LoRA model updates its metadata correctly in the DB |
+| **Preconditions** | Test SQLite DB initialized; 1 'LoraModel' row seeded with known values|
+| **Test steps** | 1. **Arrange** — seed a 'LoraModel' with ^name: "OldName"' and 'category: "Style"'.      <br/> 2. **Act** — call 'lora_service.update(lora_id, { name: "NewName", category: "Lighting" })', then re-query the record.    <br/> 3. **Assert** — the updated record reflects the new name and category; no duplicate or extra rows are created | 
+| **Test data** | Original: '{ name: "OldName", category: "Style" } → Updated: { name: "NewName", category: "Lighting" }' |
+| **Expected result** | DB record is updated in place; lora_service.get_all() returns 1 row with the new values |
+| **Actual result** |  — |
+| **Status** | — |
+| **Comments** | Covers the edit operation of US10 — admin can correct or update LoRA model metadata; complements TC_007 (delete) and TC_009 (read) |
+
 ---
 
 ### Libraries Used
