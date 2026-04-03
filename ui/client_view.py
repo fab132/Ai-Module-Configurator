@@ -84,6 +84,12 @@ def create_client_view():
                                         open_delete_dialog(cid, cname)
                                     return do_delete
 
+                                def make_open(cid):
+                                    def do_open():
+                                        ui.navigate.to(f"/client/{cid}")
+                                    return do_open
+
+                                ui.button("View Profile", on_click=make_open(c.id)).props("unelevated color=deep-purple dense")
                                 ui.button("Edit", on_click=make_edit(c)).props("flat color=deep-purple-3 dense")
                                 ui.button("Delete", on_click=make_delete(c.id, c.name)).props("flat color=red dense")
 

@@ -74,8 +74,23 @@ class Client(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False, unique=True)
     email = Column(String)
-    profile_picture = Column(String)   # local file path under data/client_pics/
-    lora_checkpoint = Column(String)   # e.g. "sarah_v1.safetensors"
+    profile_picture = Column(String)
+    lora_checkpoint = Column(String)
+    lora_weight = Column(Float, default=0.8)
     prompt_prefix = Column(String, default="")
+    negative_prompt = Column(String, default="")
     notes = Column(String)
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    photos = relationship("ClientPhoto", back_populates="client", cascade="all, delete-orphan")
+
+
+class ClientPhoto(Base):
+    __tablename__ = "client_photos"
+
+    id = Column(Integer, primary_key=True)
+    client_id = Column(Integer, ForeignKey("clients.id"), nullable=False)
+    file_path = Column(String, nullable=False)
+    category = Column(String, default="face")   # face | body | style
+    label = Column(String, default="")
+    uploaded_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    client = relationship("Client", back_populates="photos")

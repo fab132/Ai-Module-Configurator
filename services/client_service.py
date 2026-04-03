@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from models.entities import Client
+from models.entities import Client, ClientPhoto
 
 
 def get_all(db: Session) -> list[Client]:
@@ -32,7 +32,8 @@ def add(db: Session, name: str, email: str = None, lora_checkpoint: str = None,
 
 def update(db: Session, client_id: int, name: str, email: str = None,
            lora_checkpoint: str = None, prompt_prefix: str = "",
-           notes: str = None, profile_picture: str = None) -> Client:
+           notes: str = None, profile_picture: str = None,
+           lora_weight: float = None, negative_prompt: str = None) -> Client:
     client = db.query(Client).filter(Client.id == client_id).first()
     if not client:
         raise ValueError(f"Client {client_id} not found")
@@ -43,6 +44,10 @@ def update(db: Session, client_id: int, name: str, email: str = None,
     client.notes = notes.strip() if notes else None
     if profile_picture is not None:
         client.profile_picture = profile_picture
+    if lora_weight is not None:
+        client.lora_weight = lora_weight
+    if negative_prompt is not None:
+        client.negative_prompt = negative_prompt.strip()
     db.commit()
     db.refresh(client)
     return client
@@ -52,4 +57,34 @@ def delete(db: Session, client_id: int) -> None:
     client = db.query(Client).filter(Client.id == client_id).first()
     if client:
         db.delete(client)
+        db.commit()
+
+
+# ── Photo management ──────────────────────────────────────────────────────────
+
+def add_photo(db: Session, client_id: int, file_path: str,
+              category: str = "face", label: str = "") -> ClientPhoto:
+    photo = ClientPhoto(
+        client_id=client_id,
+        file_path=file_path,
+        category=category,
+        label=label,
+    )
+    db.add(photo)
+    db.commit()
+    db.refresh(photo)
+    return photo
+
+
+def get_photos(db: Session, client_id: int, category: str = None) -> list[ClientPhoto]:
+    q = db.query(ClientPhoto).filter(ClientPhoto.client_id == client_id)
+    if category:
+        q = q.filter(ClientPhoto.category == category)
+    return q.order_by(ClientPhoto.uploaded_at).all()
+
+
+def delete_photo(db: Session, photo_id: int) -> None:
+    photo = db.query(ClientPhoto).filter(ClientPhoto.id == photo_id).first()
+    if photo:
+        db.delete(photo)
         db.commit()
