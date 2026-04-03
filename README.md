@@ -157,7 +157,7 @@ As an admin, I want to delete a LoRA model from the library so outdated or unuse
 
 ### Wireframes / Mockups
 
-![Wireframe – Main](docs/architecture-diagrams/wireframe_main.svg)
+![Wireframe – Main](docs/architecture-diagrams/wireframe_main_2.svg)
 
 ---
 
