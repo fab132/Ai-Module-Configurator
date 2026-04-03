@@ -1,0 +1,185 @@
+<svg width="1300" height="920" viewBox="0 0 1300 920" xmlns="http://www.w3.org/2000/svg" font-family="Arial, sans-serif">
+  <rect width="1300" height="920" fill="#1a1a1a"/>
+  <rect x="20" y="20" width="1260" height="880" rx="16" fill="white"/>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SCREEN 1: Configure Run (top left) -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <rect x="50" y="50" width="360" height="560" rx="14" fill="white" stroke="#333" stroke-width="1.5"/>
+  <!-- Title bar -->
+  <rect x="50" y="50" width="360" height="46" rx="14" fill="#F4F4F4" stroke="#333" stroke-width="1.5"/>
+  <rect x="50" y="78" width="360" height="18" fill="#F4F4F4"/>
+  <text x="74" y="79" font-size="15" font-weight="bold" fill="#222">⚙ AIVP – Configure Run</text>
+
+  <!-- Person -->
+  <text x="74" y="118" font-size="12" fill="#444">Person</text>
+  <rect x="74" y="126" width="312" height="32" rx="6" fill="white" stroke="#CCC" stroke-width="1"/>
+  <text x="90" y="147" font-size="12" fill="#555">Persona_A</text>
+  <text x="368" y="147" font-size="11" fill="#888">▾</text>
+
+  <!-- Content-Type -->
+  <text x="74" y="178" font-size="12" fill="#444">Content-Type</text>
+  <rect x="74" y="186" width="312" height="32" rx="6" fill="white" stroke="#CCC" stroke-width="1"/>
+  <text x="90" y="207" font-size="12" fill="#555">Photo</text>
+  <text x="368" y="207" font-size="11" fill="#888">▾</text>
+
+  <!-- Platform -->
+  <text x="74" y="238" font-size="12" fill="#444">Platform</text>
+  <rect x="74" y="246" width="312" height="32" rx="6" fill="white" stroke="#CCC" stroke-width="1"/>
+  <text x="90" y="267" font-size="12" fill="#555">Instagram</text>
+  <text x="368" y="267" font-size="11" fill="#888">▾</text>
+
+  <!-- Format -->
+  <text x="74" y="298" font-size="12" fill="#444">Format</text>
+  <rect x="74" y="306" width="312" height="32" rx="6" fill="white" stroke="#CCC" stroke-width="1"/>
+  <text x="90" y="327" font-size="12" fill="#555">Square</text>
+  <text x="368" y="327" font-size="11" fill="#888">▾</text>
+
+  <!-- Scenery -->
+  <text x="74" y="358" font-size="12" fill="#444">Scenery</text>
+  <rect x="74" y="366" width="312" height="32" rx="6" fill="white" stroke="#CCC" stroke-width="1"/>
+  <text x="90" y="387" font-size="12" fill="#555">Studio</text>
+  <text x="368" y="387" font-size="11" fill="#888">▾</text>
+
+  <!-- Outfit -->
+  <text x="74" y="418" font-size="12" fill="#444">Outfit</text>
+  <rect x="74" y="426" width="312" height="32" rx="6" fill="white" stroke="#CCC" stroke-width="1"/>
+  <text x="90" y="447" font-size="12" fill="#555">Casual</text>
+  <text x="368" y="447" font-size="11" fill="#888">▾</text>
+
+  <!-- Run button -->
+  <rect x="74" y="530" width="312" height="44" rx="8" fill="#2E86C1" stroke="none"/>
+  <text x="230" y="558" text-anchor="middle" font-size="14" font-weight="bold" fill="white">▶  Run</text>
+
+  <!-- Caption -->
+  <text x="230" y="628" text-anchor="middle" font-size="11" fill="#888" font-style="italic">Main page – Configure Run</text>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SCREEN 2: Run History (top center) -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <rect x="450" y="50" width="380" height="560" rx="14" fill="white" stroke="#333" stroke-width="1.5"/>
+  <rect x="450" y="50" width="380" height="46" rx="14" fill="#F4F4F4" stroke="#333" stroke-width="1.5"/>
+  <rect x="450" y="78" width="380" height="18" fill="#F4F4F4"/>
+  <text x="474" y="79" font-size="15" font-weight="bold" fill="#222">🕐 AIVP – Run History</text>
+
+  <!-- Table header -->
+  <rect x="474" y="106" width="332" height="30" rx="0" fill="#F0F0F0" stroke="#DDD" stroke-width="0.8"/>
+  <text x="490" y="126" font-size="12" font-weight="bold" fill="#333">Run</text>
+  <text x="530" y="126" font-size="12" font-weight="bold" fill="#333">Timestamp</text>
+  <text x="680" y="126" font-size="12" font-weight="bold" fill="#333">Person</text>
+  <text x="760" y="126" font-size="12" font-weight="bold" fill="#333">Platform</text>
+
+  <!-- Row 1 -->
+  <rect x="474" y="136" width="332" height="30" fill="white" stroke="#DDD" stroke-width="0.8"/>
+  <text x="490" y="156" font-size="12" fill="#333">3</text>
+  <text x="530" y="156" font-size="12" fill="#333">2026-04-01 14:44</text>
+  <text x="680" y="156" font-size="12" fill="#333">Persona_A</text>
+  <text x="760" y="156" font-size="12" fill="#333">Instagram</text>
+
+  <!-- Row 2 -->
+  <rect x="474" y="166" width="332" height="30" fill="#FAFAFA" stroke="#DDD" stroke-width="0.8"/>
+  <text x="490" y="186" font-size="12" fill="#333">2</text>
+  <text x="530" y="186" font-size="12" fill="#333">2026-04-01 14:22</text>
+  <text x="680" y="186" font-size="12" fill="#333">Persona_B</text>
+  <text x="760" y="186" font-size="12" fill="#333">TikTok</text>
+
+  <!-- Row 3 -->
+  <rect x="474" y="196" width="332" height="30" fill="white" stroke="#DDD" stroke-width="0.8"/>
+  <text x="490" y="216" font-size="12" fill="#333">1</text>
+  <text x="530" y="216" font-size="12" fill="#333">2026-04-01 10:51</text>
+  <text x="680" y="216" font-size="12" fill="#333">Persona_A</text>
+  <text x="760" y="216" font-size="12" fill="#333">Instagram</text>
+
+  <text x="640" y="628" text-anchor="middle" font-size="11" fill="#888" font-style="italic">History view – Run History</text>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SCREEN 3: Admin LoRA Library (top right) -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <rect x="870" y="50" width="380" height="560" rx="14" fill="white" stroke="#333" stroke-width="1.5"/>
+  <rect x="870" y="50" width="380" height="46" rx="14" fill="#F4F4F4" stroke="#333" stroke-width="1.5"/>
+  <rect x="870" y="78" width="380" height="18" fill="#F4F4F4"/>
+  <text x="894" y="79" font-size="15" font-weight="bold" fill="#222">🔒 Admin – LoRA Library</text>
+
+  <!-- Add button -->
+  <rect x="894" y="108" width="80" height="32" rx="6" fill="#27AE60" stroke="none"/>
+  <text x="934" y="129" text-anchor="middle" font-size="13" font-weight="bold" fill="white">+ Add</text>
+
+  <!-- Table header -->
+  <rect x="894" y="154" width="332" height="30" fill="#F0F0F0" stroke="#DDD" stroke-width="0.8"/>
+  <text x="910" y="174" font-size="12" font-weight="bold" fill="#333">Name</text>
+  <text x="1060" y="174" font-size="12" font-weight="bold" fill="#333">Category</text>
+  <text x="1160" y="174" font-size="12" font-weight="bold" fill="#333">Actions</text>
+
+  <!-- Row 1 -->
+  <rect x="894" y="184" width="332" height="30" fill="white" stroke="#DDD" stroke-width="0.8"/>
+  <text x="910" y="204" font-size="12" fill="#333">StyleLora_v2</text>
+  <text x="1060" y="204" font-size="12" fill="#333">Style</text>
+  <rect x="1156" y="188" width="30" height="22" rx="4" fill="#2E86C1"/>
+  <text x="1171" y="204" text-anchor="middle" font-size="11" fill="white">✏</text>
+  <rect x="1192" y="188" width="30" height="22" rx="4" fill="#E74C3C"/>
+  <text x="1207" y="204" text-anchor="middle" font-size="11" fill="white">✕</text>
+
+  <!-- Row 2 -->
+  <rect x="894" y="214" width="332" height="30" fill="#FAFAFA" stroke="#DDD" stroke-width="0.8"/>
+  <text x="910" y="234" font-size="12" fill="#333">LightingPro</text>
+  <text x="1060" y="234" font-size="12" fill="#333">Lighting</text>
+  <rect x="1156" y="218" width="30" height="22" rx="4" fill="#2E86C1"/>
+  <text x="1171" y="234" text-anchor="middle" font-size="11" fill="white">✏</text>
+  <rect x="1192" y="218" width="30" height="22" rx="4" fill="#E74C3C"/>
+  <text x="1207" y="234" text-anchor="middle" font-size="11" fill="white">✕</text>
+
+  <!-- Row 3 -->
+  <rect x="894" y="244" width="332" height="30" fill="white" stroke="#DDD" stroke-width="0.8"/>
+  <text x="910" y="264" font-size="12" fill="#333">OutfitBase</text>
+  <text x="1060" y="264" font-size="12" fill="#333">Outfit</text>
+  <rect x="1156" y="248" width="30" height="22" rx="4" fill="#2E86C1"/>
+  <text x="1171" y="264" text-anchor="middle" font-size="11" fill="white">✏</text>
+  <rect x="1192" y="248" width="30" height="22" rx="4" fill="#E74C3C"/>
+  <text x="1207" y="264" text-anchor="middle" font-size="11" fill="white">✕</text>
+
+  <text x="1060" y="628" text-anchor="middle" font-size="11" fill="#888" font-style="italic">Library view – LoRA Library (Admin)</text>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SCREEN 4: Login (bottom left) -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <rect x="50" y="660" width="360" height="230" rx="14" fill="white" stroke="#333" stroke-width="1.5"/>
+  <rect x="50" y="660" width="360" height="46" rx="14" fill="#F4F4F4" stroke="#333" stroke-width="1.5"/>
+  <rect x="50" y="688" width="360" height="18" fill="#F4F4F4"/>
+  <text x="74" y="689" font-size="15" font-weight="bold" fill="#222">🔑 AIVP – Login</text>
+
+  <text x="74" y="730" font-size="12" fill="#444">Email</text>
+  <rect x="74" y="738" width="312" height="32" rx="6" fill="white" stroke="#CCC" stroke-width="1"/>
+  <text x="90" y="759" font-size="12" fill="#BBB">operator@aivp.ch</text>
+
+  <text x="74" y="790" font-size="12" fill="#444">Password</text>
+  <rect x="74" y="798" width="312" height="32" rx="6" fill="white" stroke="#CCC" stroke-width="1"/>
+  <text x="90" y="819" font-size="12" fill="#BBB">••••••••••</text>
+
+  <rect x="74" y="844" width="312" height="38" rx="8" fill="#2E86C1" stroke="none"/>
+  <text x="230" y="868" text-anchor="middle" font-size="14" font-weight="bold" fill="white">Login</text>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SCREEN 5: Combo Manager (bottom center) -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <rect x="450" y="660" width="420" height="230" rx="14" fill="white" stroke="#333" stroke-width="1.5"/>
+  <rect x="450" y="660" width="420" height="46" rx="14" fill="#F4F4F4" stroke="#333" stroke-width="1.5"/>
+  <rect x="450" y="688" width="420" height="18" fill="#F4F4F4"/>
+  <text x="474" y="689" font-size="15" font-weight="bold" fill="#222">💾 AIVP – Combo Manager</text>
+
+  <text x="474" y="730" font-size="12" fill="#444">Template name</text>
+  <rect x="474" y="738" width="220" height="32" rx="6" fill="white" stroke="#CCC" stroke-width="1"/>
+  <text x="490" y="759" font-size="12" fill="#555">MyTemplate</text>
+  <text x="684" y="759" font-size="11" fill="#888">▾</text>
+
+  <!-- Save button -->
+  <rect x="706" y="738" width="120" height="32" rx="6" fill="#27AE60" stroke="none"/>
+  <text x="766" y="759" text-anchor="middle" font-size="13" font-weight="bold" fill="white">Save</text>
+
+  <!-- Load / Delete buttons -->
+  <rect x="474" y="790" width="120" height="36" rx="6" fill="#2E86C1" stroke="none"/>
+  <text x="534" y="813" text-anchor="middle" font-size="13" font-weight="bold" fill="white">Load</text>
+
+  <rect x="610" y="790" width="120" height="36" rx="6" fill="#E74C3C" stroke="none"/>
+  <text x="670" y="813" text-anchor="middle" font-size="13" font-weight="bold" fill="white">Delete</text>
+
+</svg>
