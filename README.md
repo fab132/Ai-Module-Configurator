@@ -511,12 +511,30 @@ Overall 15 tests
 | **Comments** | Covers the edit operation of US10 — admin can correct or update LoRA model metadata; complements TC_007 (delete) and TC_009 (read) |
 
 ---
+**Run:**
+```bash
+pytest
+```
+
+Run tests by category:
+```bash
+pytest -m unit
+pytest -m db
+pytest -m integration
+```
+
+Generate a coverage report:
+```bash
+pytest --cov=services --cov=models --cov=utils --cov-report=html
+```
+---
 
 ### Libraries Used
 
 - nicegui
 - sqlalchemy
 - pydantic
+- bcrypt
 - python-dotenv
 - pytest
 
