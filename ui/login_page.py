@@ -1,4 +1,4 @@
-from nicegui import ui
+from nicegui import ui, app
 
 CUSTOM_CSS = """
     body, .q-page { background: #0a0a14 !important; }
@@ -60,6 +60,7 @@ def create_login_page():
                         db = SessionLocal()
                         auth_login(db, email.value, password.value)
                         db.close()
+                        app.storage.user['authenticated'] = True
                         ui.navigate.to("/")
                     except ValueError as e:
                         error_label.set_text(str(e))

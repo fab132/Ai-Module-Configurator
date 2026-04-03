@@ -1,5 +1,8 @@
-from nicegui import ui
+from nicegui import ui, app
 from ui.lora_selector import create_configurator
+from ui.history_view import create_history_view
+from ui.library_view import create_library_view
+from ui.combo_manager import create_combo_manager
 
 CUSTOM_CSS = """
     body, .q-page { background: #0a0a14 !important; }
@@ -60,6 +63,9 @@ CUSTOM_CSS = """
 def create_main_page():
     @ui.page("/")
     def index():
+        if not app.storage.user.get('authenticated'):
+            ui.navigate.to("/login")
+            return
         ui.dark_mode().enable()
         ui.add_css(CUSTOM_CSS)
 
@@ -86,13 +92,10 @@ def create_main_page():
                 create_configurator()
 
             with ui.tab_panel(tab_combos):
-                with ui.element("div").classes("p-10 text-center").style("color: #6b7280"):
-                    ui.label("📁  Templates — coming soon")
+                create_combo_manager()
 
             with ui.tab_panel(tab_history):
-                with ui.element("div").classes("p-10 text-center").style("color: #6b7280"):
-                    ui.label("📋  History — coming soon")
+                create_history_view()
 
             with ui.tab_panel(tab_library):
-                with ui.element("div").classes("p-10 text-center").style("color: #6b7280"):
-                    ui.label("🗂️  Library — coming soon")
+                create_library_view()
