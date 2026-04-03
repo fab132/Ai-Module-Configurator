@@ -159,11 +159,103 @@ def create_customer_portal():
 
         # ── Tabs ─────────────────────────────────────────────────────────────
         with ui.tabs().classes("w-full mt-6").props("dense align=left") as tabs:
+            tab_request = ui.tab("⚡   Request Production").props("no-caps")
             tab_profile = ui.tab("🪪   My Profile").props("no-caps")
             tab_photos  = ui.tab("📸   My Photos").props("no-caps")
             tab_history = ui.tab("🎬   My Productions").props("no-caps")
 
-        with ui.tab_panels(tabs, value=tab_profile).classes("w-full"):
+        with ui.tab_panels(tabs, value=tab_request).classes("w-full"):
+
+            # ── REQUEST PRODUCTION ────────────────────────────────────────────
+            with ui.tab_panel(tab_request):
+                with ui.element("div").classes("p-8 w-full max-w-4xl mx-auto"):
+                    ui.label("Request a Production").classes("text-white font-bold mb-1").style("font-size:1.2rem")
+                    ui.label("Choose your preferences below and submit — our team will produce your content.").style(
+                        "color:#6b7280; font-size:0.86rem; margin-bottom:2rem"
+                    )
+
+                    from services.config_loader import get_options
+                    db_r = SessionLocal()
+                    try:
+                        client_r = db_r.query(Client).filter(Client.email == email).first()
+                        client_name = client_r.name if client_r else email
+                    finally:
+                        db_r.close()
+
+                    REQUEST_PARAMS = [
+                        ("content_type", "Content Type", "🎬"),
+                        ("platform",     "Platform",     "📱"),
+                        ("format",       "Format",       "📐"),
+                        ("scenery",      "Scenery",      "🏙️"),
+                        ("outfit",       "Outfit",       "👗"),
+                        ("lighting",     "Lighting",     "💡"),
+                        ("perspective",  "Perspective",  "🎯"),
+                    ]
+
+                    sel = {}
+
+                    with ui.element("div").style(
+                        "display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:1.2rem; margin-bottom:1.5rem"
+                    ):
+                        # Person card — pre-filled, read-only
+                        with ui.element("div").classes("param-card p-5 flex flex-col gap-2"):
+                            ui.label("👤  Person").style("color:#a78bfa; font-size:0.8rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase")
+                            with ui.row().classes("items-center gap-2"):
+                                ui.label(client_name).classes("text-white font-semibold").style("font-size:0.95rem")
+                                ui.badge("You").props("color=deep-purple-9 text-color=white")
+
+                        for key, label, icon in REQUEST_PARAMS:
+                            options = get_options(key)
+                            with ui.element("div").classes("param-card p-5 flex flex-col gap-2"):
+                                ui.label(f"{icon}  {label}").style(
+                                    "color:#a78bfa; font-size:0.8rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase"
+                                )
+                                s = ui.select(
+                                    options=options, label="Select...", with_input=True
+                                ).classes("w-full").props("outlined dark dense color=deep-purple-3")
+                                sel[key] = s
+
+                    # Notes field
+                    with ui.element("div").classes("param-card p-5 mb-6"):
+                        ui.label("📝  Additional Notes").style(
+                            "color:#a78bfa; font-size:0.8rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.5rem; display:block"
+                        )
+                        notes_input = ui.textarea(
+                            placeholder="Any specific instructions, preferences, or details for the production team..."
+                        ).classes("w-full").props("outlined dark dense color=deep-purple-3 rows=3")
+
+                    submit_err = ui.label("").style("color:#f87171; font-size:0.85rem; min-height:1rem")
+
+                    def submit_request():
+                        missing = [label for key, label, _ in REQUEST_PARAMS if not sel[key].value]
+                        if missing:
+                            submit_err.set_text(f"Please select: {', '.join(missing)}")
+                            return
+                        submit_err.set_text("")
+                        params = {key: sel[key].value for key, _, _ in REQUEST_PARAMS}
+                        params["person"] = client_name
+
+                        from services.configurator import run as cfg_run
+                        db_s = SessionLocal()
+                        try:
+                            cfg_run(db_s, params=params, customer=client_name,
+                                    combo_name=notes_input.value or None, send_to_api=False)
+                            # Reset dropdowns
+                            for s in sel.values():
+                                s.set_value(None)
+                            notes_input.set_value("")
+                            ui.notify("✅ Production request submitted! Our team will get started soon.", type="positive", position="top", timeout=5000)
+                        except Exception as ex:
+                            submit_err.set_text(f"Error: {ex}")
+                        finally:
+                            db_s.close()
+
+                    with ui.row().classes("justify-center mt-2"):
+                        ui.button("⚡  Submit Request", on_click=submit_request).props(
+                            "unelevated color=deep-purple"
+                        ).style(
+                            "font-size:1.1rem; padding:0.9rem 4rem; border-radius:14px; letter-spacing:0.12em; font-weight:700"
+                        )
 
             # ── MY PROFILE ────────────────────────────────────────────────────
             with ui.tab_panel(tab_profile):
