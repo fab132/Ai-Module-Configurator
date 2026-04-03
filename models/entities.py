@@ -53,6 +53,19 @@ class User(Base):
     email = Column(String, nullable=False, unique=True)
     hashed_password = Column(String, nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    profile = relationship("UserProfile", back_populates="user", uselist=False)
+
+
+class UserProfile(Base):
+    __tablename__ = "user_profiles"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), unique=True, nullable=False)
+    full_name = Column(String, default="")
+    bio = Column(String, default="")
+    role = Column(String, default="Operator")
+    profile_picture = Column(String)   # data/profile_pics/...
+    cover_picture = Column(String)     # data/profile_covers/...
+    user = relationship("User", back_populates="profile")
 
 
 class Client(Base):

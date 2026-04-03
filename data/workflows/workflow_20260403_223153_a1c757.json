@@ -1,0 +1,50 @@
+{
+  "person": {
+    "name": "sarah",
+    "gender": "female",
+    "checkpoint": "sarah_v1.safetensors",
+    "loras": [],
+    "prompt_prefix": "photo of sarah, woman, "
+  },
+  "content_type": {
+    "name": "photo",
+    "sampler": "euler",
+    "steps": 30
+  },
+  "platform": {
+    "name": "tiktok",
+    "aspect_ratio": "9:16",
+    "resolution": "1080x1920"
+  },
+  "format": {
+    "name": "square",
+    "width": 1024,
+    "height": 1024
+  },
+  "scenery": {
+    "name": "beach",
+    "prompt": "beach setting, sandy shore, ocean waves, "
+  },
+  "outfit": {
+    "name": "elegant",
+    "prompt": "elegant outfit, formal wear, "
+  },
+  "lighting": {
+    "name": "golden_hour",
+    "prompt": "golden hour lighting, warm tones, sunset, "
+  },
+  "perspective": {
+    "name": "medium_shot",
+    "prompt": "medium shot, waist up, "
+  },
+  "_meta": {
+    "person": "sarah",
+    "content_type": "photo",
+    "platform": "tiktok",
+    "format": "square",
+    "scenery": "beach",
+    "outfit": "elegant",
+    "lighting": "golden_hour",
+    "perspective": "medium_shot"
+  }
+}

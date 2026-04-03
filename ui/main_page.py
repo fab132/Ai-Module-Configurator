@@ -4,6 +4,7 @@ from ui.history_view import create_history_view
 from ui.library_view import create_library_view
 from ui.combo_manager import create_combo_manager
 from ui.client_view import create_client_view
+from ui.profile_view import create_profile_view
 
 CUSTOM_CSS = """
     body, .q-page { background: #0a0a14 !important; }
@@ -88,6 +89,7 @@ def create_main_page():
 
         # ── Tabs ────────────────────────────────────────────────────────────
         with ui.tabs().classes("w-full").props("dense align=left") as tabs:
+            tab_profile = ui.tab("🪪   Profile").props("no-caps")
             tab_config  = ui.tab("🎛️   Configure").props("no-caps")
             tab_combos  = ui.tab("📁   Templates").props("no-caps")
             tab_history = ui.tab("📋   History").props("no-caps")
@@ -96,7 +98,10 @@ def create_main_page():
 
         selections = {}
 
-        with ui.tab_panels(tabs, value=tab_config).classes("w-full"):
+        with ui.tab_panels(tabs, value=tab_profile).classes("w-full"):
+
+            with ui.tab_panel(tab_profile):
+                create_profile_view()
 
             with ui.tab_panel(tab_config):
                 selections = create_configurator()
