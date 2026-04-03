@@ -1,4 +1,4 @@
-from nicegui import ui
+from nicegui import ui, app
 
 CUSTOM_CSS = """
     body, .q-page { background: #0a0a14 !important; }
@@ -40,7 +40,7 @@ def create_register_page():
                     )
 
         with ui.element("div").classes("flex items-center justify-center").style("min-height: calc(100vh - 110px)"):
-            with ui.element("div").classes("auth-card p-10").style("width: 400px"):
+            with ui.element("div").classes("auth-card p-10").style("width: 420px"):
                 ui.label("Create Account").classes("text-white font-bold text-center w-full").style(
                     "font-size: 1.6rem; margin-bottom: 1.5rem"
                 )
@@ -53,7 +53,33 @@ def create_register_page():
                     'type=password outlined dense dark color=deep-purple-4'
                 )
 
-                error_label = ui.label("").style("color: #f87171; font-size: 0.85rem; min-height: 1.2rem")
+                # Role selector
+                role_state = {"value": "Operator"}
+
+                ui.label("I am registering as").style("color:#9ca3af; font-size:0.85rem; margin-top:1.2rem; display:block; margin-bottom:0.5rem")
+
+                with ui.row().classes("gap-3 w-full"):
+                    btn_op = ui.button("🎛️  Operator").props("unelevated color=deep-purple").classes("flex-1")
+                    btn_cu = ui.button("👤  Customer").props("outlined color=deep-purple-3").classes("flex-1")
+
+                    def set_operator():
+                        role_state["value"] = "Operator"
+                        btn_op.props("unelevated color=deep-purple")
+                        btn_cu.props("outlined color=deep-purple-3")
+
+                    def set_customer():
+                        role_state["value"] = "Customer"
+                        btn_cu.props("unelevated color=deep-purple")
+                        btn_op.props("outlined color=deep-purple-3")
+
+                    btn_op.on("click", set_operator)
+                    btn_cu.on("click", set_customer)
+
+                ui.label("Operators manage productions. Customers upload their reference photos.").style(
+                    "color:#6b7280; font-size:0.75rem; margin-top:0.4rem; line-height:1.4"
+                )
+
+                error_label = ui.label("").style("color: #f87171; font-size: 0.85rem; min-height: 1.2rem; margin-top:0.5rem")
 
                 def handle_register():
                     from models.database import SessionLocal
@@ -67,7 +93,7 @@ def create_register_page():
                         return
                     try:
                         db = SessionLocal()
-                        auth_register(db, email.value, password.value)
+                        auth_register(db, email.value, password.value, role=role_state["value"])
                         db.close()
                         ui.navigate.to("/login")
                     except ValueError as e:
@@ -75,7 +101,7 @@ def create_register_page():
                     except Exception:
                         error_label.set_text("An unexpected error occurred")
 
-                ui.button("Create Account", on_click=handle_register).classes("auth-btn w-full mt-6").props("unelevated")
+                ui.button("Create Account", on_click=handle_register).classes("auth-btn w-full mt-4").props("unelevated")
 
                 with ui.row().classes("justify-center mt-4 gap-1"):
                     ui.label("Already have an account?").style("color: #6b7280; font-size: 0.85rem")

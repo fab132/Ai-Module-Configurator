@@ -68,6 +68,9 @@ def create_main_page():
         if not app.storage.user.get('authenticated'):
             ui.navigate.to("/login")
             return
+        if app.storage.user.get('role') == 'Customer':
+            ui.navigate.to("/customer")
+            return
         ui.dark_mode().enable()
         ui.add_css(CUSTOM_CSS)
 

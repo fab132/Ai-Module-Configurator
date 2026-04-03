@@ -54,15 +54,20 @@ def create_login_page():
 
                 def handle_login():
                     from models.database import SessionLocal
-                    from services.auth_service import login as auth_login
+                    from services.auth_service import login as auth_login, get_role
                     error_label.set_text("")
                     try:
                         db = SessionLocal()
                         auth_login(db, email.value, password.value)
+                        role = get_role(db, email.value)
                         db.close()
                         app.storage.user['authenticated'] = True
                         app.storage.user['email'] = email.value
-                        ui.navigate.to("/")
+                        app.storage.user['role'] = role
+                        if role == "Customer":
+                            ui.navigate.to("/customer")
+                        else:
+                            ui.navigate.to("/")
                     except ValueError as e:
                         error_label.set_text(str(e))
                     except Exception:

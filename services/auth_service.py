@@ -1,13 +1,26 @@
 from sqlalchemy.orm import Session
-from models.entities import User
+from models.entities import User, UserProfile, Client
 from utils.password_utils import hash_password, verify_password
 
 
-def register(db: Session, email: str, password: str) -> User:
+def register(db: Session, email: str, password: str, role: str = "Operator") -> User:
     if db.query(User).filter(User.email == email).first():
         raise ValueError("Email already registered")
     user = User(email=email, hashed_password=hash_password(password))
     db.add(user)
+    db.flush()  # get user.id without committing
+
+    profile = UserProfile(user_id=user.id, role=role)
+    db.add(profile)
+
+    if role == "Customer":
+        # Auto-create a Client record for this customer if not already there
+        existing_client = db.query(Client).filter(Client.email == email).first()
+        if not existing_client:
+            name = email.split("@")[0].replace(".", " ").replace("_", " ").title()
+            client = Client(name=name, email=email, prompt_prefix="")
+            db.add(client)
+
     db.commit()
     db.refresh(user)
     return user
@@ -18,3 +31,12 @@ def login(db: Session, email: str, password: str) -> User:
     if not user or not verify_password(password, user.hashed_password):
         raise ValueError("Invalid email or password")
     return user
+
+
+def get_role(db: Session, email: str) -> str:
+    """Returns the role for the given email. Defaults to 'Operator'."""
+    from models.entities import UserProfile
+    user = db.query(User).filter(User.email == email).first()
+    if not user or not user.profile:
+        return "Operator"
+    return user.profile.role or "Operator"

@@ -8,6 +8,7 @@ from ui.main_page import create_main_page
 from ui.login_page import create_login_page
 from ui.register_page import create_register_page
 from ui.client_profile_page import create_client_profile_page
+from ui.customer_portal import create_customer_portal
 from nicegui import ui
  
 init_db()
@@ -27,6 +28,7 @@ create_login_page()
 create_register_page()
 create_main_page()
 create_client_profile_page()
+create_customer_portal()
  
 ui.run(
     host=os.getenv("APP_HOST", "0.0.0.0"),
