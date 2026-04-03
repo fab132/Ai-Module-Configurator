@@ -46,3 +46,10 @@ class RunLog(Base):
     combo_name = Column(String)
     config_json = Column(String, nullable=False)
     ran_at = Column(DateTime, default=lambda: datetime.now(UTC))
+
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True)
+    email = Column(String, nullable=False, unique=True)
+    hashed_password = Column(String, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
