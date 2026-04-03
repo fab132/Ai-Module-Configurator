@@ -27,7 +27,7 @@ In AI content production with ComfyUI, configuring each run requires manually ed
 
 ### Scenario
 
-AIVP solves this by providing a browser-based configuration interface. The operator selects 8 parameters (Person, Content-Type, Platform, Format, Scenery, Outfit, Lighting, Perspective), each backed by a JSON config file. On clicking **Run**, the app merges all configs into a complete ComfyUI workflow and sends it directly to the ComfyUI API. Every run is logged with timestamp, settings, and customer info.
+AIVP solves this by providing a browser-based configuration interface. The operator selects 8 parameters (Person, Content-Type, Platform, Format, Scenery, Outfit, Lighting, Perspective), each backed by a JSON config file. The **Person** dropdown is powered by the Clients database — each client has a trained LoRA model path and a prompt prefix attached to their profile. On clicking **Run**, the app merges all configs into a complete ComfyUI workflow and sends it directly to the ComfyUI API. Every run is logged with timestamp, settings, and customer info.
 
 ---
 
@@ -132,6 +132,15 @@ As an admin, I want to delete a LoRA model from the library so outdated or unuse
 
 ---
 
+#### 12. Manage Clients
+
+As an admin, I want to add, edit, and delete client profiles so each person's trained LoRA model and prompt prefix are stored in one place and automatically applied when they are selected as the Person in a run.
+
+- **Inputs:** name (`str`), email (`str`), LoRA checkpoint path (`str`), prompt prefix (`str`), notes (`str`), profile picture (image upload)
+- **Outputs:** `Client` record persisted in DB; client name appears in the Person dropdown on the Configure tab
+
+---
+
 ### Use Cases
 
 ![UML Use Case Diagram](docs/architecture-diagrams/uml_use_case_diagram.svg)
@@ -147,11 +156,12 @@ As an admin, I want to delete a LoRA model from the library so outdated or unuse
 - Add LoRA Model (Admin) — add a new model entry to the library
 - Edit LoRA Model (Admin) — update metadata of an existing model entry
 - Delete LoRA Model (Admin) — remove an outdated or unused model from the library
+- Manage Clients (Admin) — add/edit/delete client profiles with LoRA model path, prompt prefix, and profile picture
 
 **Actors**
 - User (registers and logs in)
 - Operator (configures and triggers runs, manages output)
-- Admin (manages LoRA model library)
+- Admin (manages LoRA model library and client profiles)
 
 ---
 
@@ -171,7 +181,7 @@ As an admin, I want to delete a LoRA model from the library so outdated or unuse
 
 **Layers / Components:**
 - **UI** (NiceGUI pages and components — browser as thin client)
-- **Services** (business logic: auth, JSON builder, file transfer, combo/lora/history/output services)
+- **Services** (business logic: auth, JSON builder, file transfer, combo/lora/history/output/client services)
 - **Persistence** (SQLite + SQLAlchemy ORM entities)
 
 **Design Decisions:**
@@ -181,6 +191,7 @@ As an admin, I want to delete a LoRA model from the library so outdated or unuse
 - Business rules (JSON merge, validation) are testable without starting the UI
 - ComfyUI API call is isolated in `file_transfer.py` (Adapter pattern)
 - Output delivery (local download or cloud save) is handled in `output_service.py`, keeping it separate from the run pipeline
+- Client profiles are stored in the DB and automatically injected into the workflow when a client is selected as the Person parameter; the `configurator.py` looks up the client by name and passes their data to `json_builder.build()`
 
 **Design Patterns:**
 - MVC (Model–View–Controller)
@@ -192,13 +203,15 @@ As an admin, I want to delete a LoRA model from the library so outdated or unuse
 │  UI Layer (NiceGUI)                                    │
 │  Login · Register · 8 Dropdowns · Run Button           │
 │  History Table · Output Download · LoRA Library        │
+│  Client Profiles (Clients tab)                         │
 ├────────────────────────────────────────────────────────┤
 │  Service Layer (Python OOP)                            │
 │  Auth · JSON Builder · Validation · API Transfer       │
-│  Output Delivery · Combo · LoRA · History              │
+│  Output Delivery · Combo · LoRA · History · Client     │
 ├────────────────────────────────────────────────────────┤
 │  Data Layer (SQLAlchemy → SQLite)                      │
 │  User · LoraModel · Combo · ComboItem · RunLog         │
+│  Client                                                │
 └────────────────────────────────────────────────────────┘
         ↓ validated JSON
   [ ComfyUI API — external ]
@@ -219,8 +232,9 @@ As an admin, I want to delete a LoRA model from the library so outdated or unuse
 - `Combo` — a named template grouping multiple LoRA selections; owned by a `User`
 - `ComboItem` — one slot within a Combo (references a LoraModel + slot index + weight)
 - `RunLog` — immutable log entry for each production run (user, config JSON, output format, timestamp)
+- `Client` — a person/persona with a trained LoRA checkpoint, prompt prefix, optional profile picture, and contact info; client names power the Person dropdown on the Configure tab
 
-`User` ↔ `RunLog` is one-to-many (each run belongs to a user). `User` ↔ `Combo` is one-to-many. `Combo` ↔ `ComboItem` is one-to-many with cascade delete. `ComboItem` ↔ `LoraModel` is many-to-one.
+`User` ↔ `RunLog` is one-to-many (each run belongs to a user). `User` ↔ `Combo` is one-to-many. `Combo` ↔ `ComboItem` is one-to-many with cascade delete. `ComboItem` ↔ `LoraModel` is many-to-one. `Client` is standalone (no FK relationships).
 
 ---
 
@@ -234,15 +248,23 @@ The application runs entirely in the browser via NiceGUI. Users can:
 
 - Register a new account with email and password
 - Log in to access their personal run history and Combo Templates
-- Select 8 production parameters via dropdowns
+- Select 8 production parameters via dropdowns (Person dropdown populated from Clients DB)
 - Choose output format (resolution and aspect ratio) before triggering a run
-- Trigger a ComfyUI workflow with one click
+- Trigger a ComfyUI workflow with one click — client LoRA and prompt prefix are automatically injected
 - Download the generated output to their device or save it to cloud storage
 - Save and load Combo Templates
 - Browse personal run history with timestamps and settings
 - Manage the LoRA model library (add, edit, delete — admin only)
+- Manage client profiles (add, edit, delete — Clients tab)
 
 **Architecture note:** the browser is a thin client; all UI state, authentication, and business logic run server-side in the NiceGUI app.
+
+The UI is organized into **5 tabs**:
+1. **Configure** — 8-parameter dropdowns + Run button
+2. **Templates** — save and load Combo Templates
+3. **History** — browse all past runs
+4. **Library** — manage LoRA model library
+5. **Clients** — manage client profiles with LoRA checkpoints and prompt prefixes
 
 ---
 
@@ -254,13 +276,14 @@ All inputs are validated before a run is triggered:
 - Output format (resolution, aspect ratio) must be selected before triggering a run
 - Combo names must be unique and non-empty
 - LoRA model entries are validated via Pydantic schemas before DB insert
+- Client names must be non-empty and unique
 - Passwords are never stored in plaintext — hashed via `bcrypt` before persisting to DB
 
 ---
 
 ### 3. Database Management
 
-All data is managed via SQLAlchemy ORM (SQLite). Entities: `User`, `LoraModel`, `Combo`, `ComboItem`, `RunLog`. Database is initialized automatically on startup via `init_db()`. Each user's run history and combo templates are scoped to their account via foreign key relationships.
+All data is managed via SQLAlchemy ORM (SQLite). Entities: `User`, `LoraModel`, `Combo`, `ComboItem`, `RunLog`, `Client`. Database is initialized automatically on startup via `init_db()`. Each user's run history and combo templates are scoped to their account via foreign key relationships.
 
 ---
 
@@ -288,44 +311,47 @@ Ai-Module-Configurator/
 ├── requirements.txt
 ├── .env.example               # DATABASE_URL + COMFYUI_OUTPUT_PATH + CLOUD_STORAGE_URL
 ├── .gitignore
-├── main.py                    # Entry point
+├── main.py                    # Entry point (mounts /client_pics static files)
 │
 ├── docs/
 │   ├── ui-images/             # Screenshots and wireframes
 │   └── architecture-diagrams/ # UML and ER diagrams
 │
 ├── ui/                        # NiceGUI pages
-│   ├── login_page.py          # Login form (new)
-│   ├── register_page.py       # Registration form (new)
-│   ├── main_page.py
-│   ├── lora_selector.py
+│   ├── login_page.py          # Login form
+│   ├── register_page.py       # Registration form
+│   ├── main_page.py           # 5-tab shell (Configure, Templates, History, Library, Clients)
+│   ├── lora_selector.py       # Configure tab — Person dropdown loads from Clients DB
 │   ├── combo_manager.py
 │   ├── history_view.py
 │   ├── library_view.py
+│   ├── client_view.py         # Clients tab — full CRUD for client profiles
 │   └── components/
 │
 ├── services/                  # Business logic
-│   ├── auth_service.py        # Register, login, password hashing (new)
-│   ├── config_loader.py           # Loads JSON parameter config files
-│   ├── configurator.py
-│   ├── json_builder.py
+│   ├── auth_service.py        # Register, login, password hashing
+│   ├── config_loader.py       # Loads JSON parameter config files
+│   ├── configurator.py        # Orchestrates run: fetch client → build → send → log
+│   ├── json_builder.py        # Merges 8 param configs; accepts optional client dict
 │   ├── file_transfer.py
-│   ├── output_service.py      # Local download + cloud save (new)
+│   ├── output_service.py      # Local download + cloud save
 │   ├── combo_service.py
 │   ├── lora_service.py
-│   └── history_service.py
+│   ├── history_service.py
+│   └── client_service.py      # CRUD for Client entity
 │
 ├── models/                    # ORM entities & DB setup
 │   ├── base.py
 │   ├── database.py
-│   └── entities.py            # Now includes User entity
+│   └── entities.py            # User, LoraModel, Combo, ComboItem, RunLog, Client
 │
 ├── utils/                     # Validators and helpers
-│   ├── validators.py          # Now includes email + password validators
-│   ├── password_utils.py      # bcrypt hashing helpers (new)
+│   ├── validators.py          # Email + password + run param validators
+│   ├── password_utils.py      # bcrypt hashing helpers
 │   └── helpers.py
 │
-├── data/                      # SQLite database (gitignored)
+├── data/                      # SQLite database + client profile pictures (gitignored)
+│   └── client_pics/           # Uploaded profile pictures served at /client_pics/
 └── tests/                     # pytest
 ```
 
@@ -363,11 +389,13 @@ Open the URL shown in the console (default: http://localhost:8080).
 
 Configure a run:
 1. Open the app — register with your email and password, or log in if you already have an account.
-2. Select values for Person, Content-Type, Platform, Format, Scenery, Outfit, Lighting, Perspective.
-3. Choose the output format (resolution and aspect ratio) for the target platform.
-4. *(Optional)* Save the selection as a Combo Template for reuse.
-5. Click **Run** → config is validated, logged, and sent to ComfyUI.
-6. Download the generated output to your device or save it to cloud storage.
+2. Go to the **Clients** tab and add client profiles. Each client needs a name; optionally add a LoRA checkpoint path and a prompt prefix that will be automatically injected into every run for that person.
+3. Switch to the **Configure** tab. The Person dropdown is now populated from the Clients database.
+4. Select values for Person, Content-Type, Platform, Format, Scenery, Outfit, Lighting, Perspective.
+5. Choose the output format (resolution and aspect ratio) for the target platform.
+6. *(Optional)* Save the selection as a Combo Template for reuse.
+7. Click **Run** → config is validated, client data is fetched and merged, workflow is logged and sent to ComfyUI.
+8. Download the generated output to your device or save it to cloud storage.
 
 <!-- ![UI – Main](docs/ui-images/ui_main.png) -->
 
@@ -575,7 +603,7 @@ We test the three core layers of the application: business logic (unit), databas
 | **Expected result** | Exactly 1 `RunLog` row exists with correct config JSON and non-null timestamp |
 | **Actual result** | — |
 | **Status** | — |
-| **Comments** | Happy path — covers the full pipeline: validate → build JSON → send → log |
+| **Comments** | Happy path — covers the full pipeline: validate → fetch client → build JSON → send → log |
 
 ---
 

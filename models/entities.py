@@ -53,3 +53,16 @@ class User(Base):
     email = Column(String, nullable=False, unique=True)
     hashed_password = Column(String, nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+
+
+class Client(Base):
+    __tablename__ = "clients"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False, unique=True)
+    email = Column(String)
+    profile_picture = Column(String)   # local file path under data/client_pics/
+    lora_checkpoint = Column(String)   # e.g. "sarah_v1.safetensors"
+    prompt_prefix = Column(String, default="")
+    notes = Column(String)
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC))

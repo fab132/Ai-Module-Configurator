@@ -3,6 +3,7 @@ from ui.lora_selector import create_configurator
 from ui.history_view import create_history_view
 from ui.library_view import create_library_view
 from ui.combo_manager import create_combo_manager
+from ui.client_view import create_client_view
 
 CUSTOM_CSS = """
     body, .q-page { background: #0a0a14 !important; }
@@ -91,6 +92,7 @@ def create_main_page():
             tab_combos  = ui.tab("📁   Templates").props("no-caps")
             tab_history = ui.tab("📋   History").props("no-caps")
             tab_library = ui.tab("🗂️   Library").props("no-caps")
+            tab_clients = ui.tab("👤   Clients").props("no-caps")
 
         selections = {}
 
@@ -107,3 +109,6 @@ def create_main_page():
 
             with ui.tab_panel(tab_library):
                 create_library_view()
+
+            with ui.tab_panel(tab_clients):
+                create_client_view()

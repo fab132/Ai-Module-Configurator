@@ -1,5 +1,6 @@
 from nicegui import ui, app
 from services.config_loader import get_options
+from models.database import SessionLocal
 
 PARAMS = [
     ("person",       "Person",       "👤"),
@@ -13,6 +14,19 @@ PARAMS = [
 ]
 
 
+def _get_person_options() -> list[str]:
+    """Load client names from DB; fall back to config files if none registered."""
+    from services.client_service import get_all
+    db = SessionLocal()
+    try:
+        clients = get_all(db)
+        if clients:
+            return [c.name for c in clients]
+    finally:
+        db.close()
+    return get_options("person")
+
+
 def create_configurator() -> dict:
     """Creates the configure-run UI. Returns selections dict for external use."""
     selections: dict[str, ui.select] = {}
@@ -23,10 +37,14 @@ def create_configurator() -> dict:
         )
 
         with ui.element("div").classes(
-            "grid grid-cols-2 gap-6 mb-10"
+            "grid gap-6 mb-10"
         ).style("grid-template-columns: repeat(4, 1fr)"):
             for key, label, icon in PARAMS:
-                options = get_options(key)
+                if key == "person":
+                    options = _get_person_options()
+                else:
+                    options = get_options(key)
+
                 with ui.element("div").classes("param-card p-6 flex flex-col gap-3"):
                     ui.label(f"{icon}  {label}").classes(
                         "text-sm font-bold uppercase tracking-widest"
@@ -38,9 +56,14 @@ def create_configurator() -> dict:
                     ).classes("w-full").props("outlined dark color=deep-purple-3")
                     selections[key] = sel
 
+                    if key == "person" and not options:
+                        ui.label("No clients yet — add them in the Clients tab").style(
+                            "color: #6b7280; font-size: 0.75rem"
+                        )
+
         # Customer / Project field
         with ui.element("div").classes("param-card p-6 mb-6").style("max-width: 420px"):
-            ui.label("👤  Customer / Project").classes(
+            ui.label("📋  Customer / Project").classes(
                 "text-sm font-bold uppercase tracking-widest mb-3 block"
             ).style("color: #a78bfa")
             customer_input = ui.input("Customer or project name").classes("w-full").props(
@@ -57,23 +80,25 @@ def create_configurator() -> dict:
                 params = {key: selections[key].value for key, _, _ in PARAMS}
                 customer = customer_input.value.strip() or app.storage.user.get("email", "anonymous")
 
-                from models.database import SessionLocal
+                from models.database import SessionLocal as _SL
                 from services.configurator import run as cfg_run
-                import requests
 
-                db = SessionLocal()
+                db = _SL()
                 try:
                     cfg_run(db, params=params, customer=customer, send_to_api=True)
                     ui.notify("⚡ Workflow sent to ComfyUI!", type="positive", position="top", timeout=4000)
                 except Exception as e:
-                    if "requests" in type(e).__module__ or "ConnectionError" in type(e).__name__ or "RequestException" in type(e).__name__:
-                        # ComfyUI not reachable — still log the run without sending
-                        from services.configurator import run as cfg_run2
+                    err_type = type(e).__name__
+                    if any(x in err_type for x in ["Connection", "Request", "Timeout", "HTTPError"]) or \
+                       "requests" in type(e).__module__:
+                        db2 = _SL()
                         try:
-                            cfg_run2(db, params=params, customer=customer, send_to_api=False)
+                            cfg_run(db2, params=params, customer=customer, send_to_api=False)
                             ui.notify("⚠️ ComfyUI unreachable — run logged locally.", type="warning", position="top", timeout=5000)
                         except Exception as inner:
                             ui.notify(f"Error: {inner}", type="negative", position="top", timeout=5000)
+                        finally:
+                            db2.close()
                     else:
                         ui.notify(f"Error: {e}", type="negative", position="top", timeout=5000)
                 finally:

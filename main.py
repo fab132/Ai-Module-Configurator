@@ -10,7 +10,12 @@ from ui.register_page import create_register_page
 from nicegui import ui
  
 init_db()
- 
+
+from pathlib import Path
+from nicegui import app as nicegui_app
+Path("data/client_pics").mkdir(parents=True, exist_ok=True)
+nicegui_app.add_static_files('/client_pics', 'data/client_pics')
+
 create_login_page()
 create_register_page()
 create_main_page()
