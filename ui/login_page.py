@@ -70,8 +70,8 @@ def create_login_page():
                             ui.navigate.to("/")
                     except ValueError as e:
                         error_label.set_text(str(e))
-                    except Exception:
-                        error_label.set_text("An unexpected error occurred")
+                    except Exception as ex:
+                        error_label.set_text(f"Error: {ex}")
 
                 ui.button("Sign In", on_click=handle_login).classes("auth-btn w-full mt-6").props("unelevated")
 

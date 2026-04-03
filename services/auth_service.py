@@ -35,8 +35,10 @@ def login(db: Session, email: str, password: str) -> User:
 
 def get_role(db: Session, email: str) -> str:
     """Returns the role for the given email. Defaults to 'Operator'."""
-    from models.entities import UserProfile
     user = db.query(User).filter(User.email == email).first()
-    if not user or not user.profile:
+    if not user:
         return "Operator"
-    return user.profile.role or "Operator"
+    profile = db.query(UserProfile).filter(UserProfile.user_id == user.id).first()
+    if not profile:
+        return "Operator"
+    return profile.role or "Operator"
