@@ -56,7 +56,7 @@ def create_register_page():
                 error_label = ui.label("").style("color: #f87171; font-size: 0.85rem; min-height: 1.2rem")
 
                 def handle_register():
-                    from models.base import SessionLocal
+                    from models.database import SessionLocal
                     from services.auth_service import register as auth_register
                     error_label.set_text("")
                     if password.value != confirm.value:

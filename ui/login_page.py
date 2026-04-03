@@ -53,7 +53,7 @@ def create_login_page():
                 error_label = ui.label("").style("color: #f87171; font-size: 0.85rem; min-height: 1.2rem")
 
                 def handle_login():
-                    from models.base import SessionLocal
+                    from models.database import SessionLocal
                     from services.auth_service import login as auth_login
                     error_label.set_text("")
                     try:
@@ -61,6 +61,7 @@ def create_login_page():
                         auth_login(db, email.value, password.value)
                         db.close()
                         app.storage.user['authenticated'] = True
+                        app.storage.user['email'] = email.value
                         ui.navigate.to("/")
                     except ValueError as e:
                         error_label.set_text(str(e))

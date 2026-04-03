@@ -71,13 +71,19 @@ def create_main_page():
 
         # ── Header ──────────────────────────────────────────────────────────
         with ui.element("div").classes("aivp-header w-full px-10 py-7"):
-            with ui.row().classes("items-center gap-4"):
-                ui.label("⚡").style("font-size: 2.4rem")
-                with ui.column().classes("gap-0"):
-                    ui.label("AIVP").classes("text-white font-black tracking-widest").style("font-size: 2rem")
-                    ui.label("AI Visual Production").style(
-                        "color: #a78bfa; font-size: 0.85rem; letter-spacing: 0.22em"
-                    )
+            with ui.row().classes("items-center justify-between"):
+                with ui.row().classes("items-center gap-4"):
+                    ui.label("⚡").style("font-size: 2.4rem")
+                    with ui.column().classes("gap-0"):
+                        ui.label("AIVP").classes("text-white font-black tracking-widest").style("font-size: 2rem")
+                        ui.label("AI Visual Production").style(
+                            "color: #a78bfa; font-size: 0.85rem; letter-spacing: 0.22em"
+                        )
+                # Logout button
+                def logout():
+                    app.storage.user['authenticated'] = False
+                    ui.navigate.to("/login")
+                ui.button("Sign out", on_click=logout).props("flat color=grey-5 dense")
 
         # ── Tabs ────────────────────────────────────────────────────────────
         with ui.tabs().classes("w-full").props("dense align=left") as tabs:
@@ -86,13 +92,15 @@ def create_main_page():
             tab_history = ui.tab("📋   History").props("no-caps")
             tab_library = ui.tab("🗂️   Library").props("no-caps")
 
+        selections = {}
+
         with ui.tab_panels(tabs, value=tab_config).classes("w-full"):
 
             with ui.tab_panel(tab_config):
-                create_configurator()
+                selections = create_configurator()
 
             with ui.tab_panel(tab_combos):
-                create_combo_manager()
+                create_combo_manager(selections)
 
             with ui.tab_panel(tab_history):
                 create_history_view()
