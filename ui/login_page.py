@@ -1,25 +1,26 @@
 from nicegui import ui, app
 
 CUSTOM_CSS = """
-    body, .q-page { background: #0a0a14 !important; }
+    body, .q-page { background: #0f0f23 !important; }
     .auth-card {
-        background: linear-gradient(135deg, #13132b 0%, #1a1a35 100%);
-        border: 1px solid rgba(139, 92, 246, 0.25);
-        border-radius: 18px;
+        background: #1a1a3e;
+        border: 1px solid #2d2d5e;
+        border-radius: 12px;
     }
     .auth-btn {
-        background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%) !important;
-        letter-spacing: 0.12em !important;
+        background: #3B82F6 !important;
+        letter-spacing: 0.08em !important;
         transition: all 0.2s ease !important;
-        border-radius: 12px !important;
+        border-radius: 8px !important;
+        font-weight: 700 !important;
     }
     .auth-btn:hover {
-        background: linear-gradient(135deg, #6d28d9 0%, #4338ca 100%) !important;
-        box-shadow: 0 0 40px rgba(124, 58, 237, 0.5) !important;
+        background: #2563EB !important;
+        box-shadow: 0 0 30px rgba(59,130,246,0.45) !important;
     }
     .aivp-header {
-        background: linear-gradient(135deg, #12022f 0%, #0a0a14 100%);
-        border-bottom: 1px solid rgba(139, 92, 246, 0.25);
+        background: #16213e;
+        border-bottom: 1px solid #2a2a4a;
     }
 """
 
@@ -74,6 +75,26 @@ def create_login_page():
                         error_label.set_text(f"Error: {ex}")
 
                 ui.button("Sign In", on_click=handle_login).classes("auth-btn w-full mt-6").props("unelevated")
+
+                # ── Demo quick-login ─────────────────────────────────────────
+                ui.separator().classes("my-5").style("border-color: rgba(139,92,246,0.2)")
+                ui.label("Demo Access").classes("text-center w-full").style(
+                    "color:#6b7280; font-size:0.78rem; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:0.6rem"
+                )
+                with ui.row().classes("gap-3 w-full"):
+                    def quick_login(demo_email, demo_password):
+                        def do():
+                            email.set_value(demo_email)
+                            password.set_value(demo_password)
+                            handle_login()
+                        return do
+
+                    ui.button("⚡  Operator Demo", on_click=quick_login("admin@aivp.com", "admin123")).props(
+                        "unelevated color=deep-purple dense"
+                    ).classes("flex-1")
+                    ui.button("👤  Customer Demo", on_click=quick_login("client@aivp.com", "client123")).props(
+                        "unelevated color=indigo-8 dense"
+                    ).classes("flex-1")
 
                 with ui.row().classes("justify-center mt-4 gap-1"):
                     ui.label("Don't have an account?").style("color: #6b7280; font-size: 0.85rem")

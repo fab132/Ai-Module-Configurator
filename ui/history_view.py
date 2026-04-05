@@ -57,7 +57,9 @@ def create_history_view():
                     rows=rows,
                     row_key="id",
                     pagination={"rowsPerPage": 15},
-                ).classes("w-full").props("dark flat bordered")
+                ).classes("w-full").props("dark flat bordered").style(
+                    "background:#1a1a3e; border:1px solid #2a2a4a; border-radius:8px"
+                )
 
         refresh_btn.on("click", load_data)
         load_data()

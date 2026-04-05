@@ -5,46 +5,57 @@ from ui.library_view import create_library_view
 from ui.combo_manager import create_combo_manager
 from ui.client_view import create_client_view
 from ui.profile_view import create_profile_view
+from ui.request_queue import create_request_queue
+from models.database import SessionLocal
+from services.history_service import count_pending
 
 CUSTOM_CSS = """
-    body, .q-page { background: #0a0a14 !important; }
+    body, .q-page { background: #0f0f23 !important; }
 
     .param-card {
-        background: linear-gradient(135deg, #13132b 0%, #1a1a35 100%);
-        border: 1px solid rgba(139, 92, 246, 0.25);
-        border-radius: 18px;
-        transition: all 0.2s ease;
+        background: #1a1a3e;
+        border: 1px solid #2d2d5e;
+        border-radius: 8px;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
     .param-card:hover {
-        border-color: rgba(139, 92, 246, 0.7);
-        transform: translateY(-4px);
-        box-shadow: 0 12px 36px rgba(139, 92, 246, 0.22);
+        border-color: #60A5FA;
+        box-shadow: 0 4px 20px rgba(96,165,250,0.12);
     }
 
     .run-btn {
-        background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%) !important;
+        background: #60A5FA !important;
         letter-spacing: 0.18em !important;
         transition: all 0.2s ease !important;
-        font-size: 1.25rem !important;
-        padding: 1.1rem 5rem !important;
-        border-radius: 16px !important;
+        font-size: 1.1rem !important;
+        padding: 0.8rem 4rem !important;
+        border-radius: 22px !important;
+        color: white !important;
+        font-weight: 700 !important;
     }
     .run-btn:hover {
-        background: linear-gradient(135deg, #6d28d9 0%, #4338ca 100%) !important;
-        box-shadow: 0 0 56px rgba(124, 58, 237, 0.55) !important;
-        transform: scale(1.04);
+        background: #3B82F6 !important;
+        box-shadow: 0 0 40px rgba(96,165,250,0.4) !important;
     }
 
     .aivp-header {
-        background: linear-gradient(135deg, #12022f 0%, #0a0a14 100%);
-        border-bottom: 1px solid rgba(139, 92, 246, 0.25);
+        background: #16213e;
+        border-bottom: 1px solid #2a2a4a;
     }
 
+    .q-tabs {
+        background: #16213e !important;
+        border-bottom: 1px solid #2a2a4a !important;
+    }
     .q-tab--active .q-tab__label {
-        color: #a78bfa !important;
+        color: #60A5FA !important;
         font-size: 1rem !important;
     }
+    .q-tab--active {
+        border-bottom: 2px solid #60A5FA !important;
+    }
     .q-tab__label {
+        color: #6B7280;
         font-size: 1rem !important;
     }
     .q-tabs__content {
@@ -52,12 +63,6 @@ CUSTOM_CSS = """
     }
     .q-tab-panels {
         background: transparent !important;
-    }
-    .q-select .q-field__label {
-        font-size: 1rem !important;
-    }
-    .q-select .q-field__native {
-        font-size: 1rem !important;
     }
 """
 
@@ -78,11 +83,11 @@ def create_main_page():
         with ui.element("div").classes("aivp-header w-full px-10 py-7"):
             with ui.row().classes("items-center justify-between"):
                 with ui.row().classes("items-center gap-4"):
-                    ui.label("⚡").style("font-size: 2.4rem")
+                    ui.label("⚡").style("font-size: 2.4rem; color: #7B68EE")
                     with ui.column().classes("gap-0"):
                         ui.label("AIVP").classes("text-white font-black tracking-widest").style("font-size: 2rem")
                         ui.label("AI Visual Production").style(
-                            "color: #a78bfa; font-size: 0.85rem; letter-spacing: 0.22em"
+                            "color: #6B7280; font-size: 0.85rem; letter-spacing: 0.22em"
                         )
                 # Logout button
                 def logout():
@@ -90,14 +95,22 @@ def create_main_page():
                     ui.navigate.to("/login")
                 ui.button("Sign out", on_click=logout).props("flat color=grey-5 dense")
 
+        # ── Pending count for Requests tab badge ────────────────────────────
+        _db_n = SessionLocal()
+        _pending_n = count_pending(_db_n)
+        _db_n.close()
+
         # ── Tabs ────────────────────────────────────────────────────────────
         with ui.tabs().classes("w-full").props("dense align=left") as tabs:
-            tab_profile = ui.tab("🪪   Profile").props("no-caps")
-            tab_config  = ui.tab("🎛️   Configure").props("no-caps")
-            tab_combos  = ui.tab("📁   Templates").props("no-caps")
-            tab_history = ui.tab("📋   History").props("no-caps")
-            tab_library = ui.tab("🗂️   Library").props("no-caps")
-            tab_clients = ui.tab("👤   Clients").props("no-caps")
+            tab_profile  = ui.tab("🪪   Profile").props("no-caps")
+            tab_config   = ui.tab("🎛️   Configure").props("no-caps")
+            tab_combos   = ui.tab("📁   Templates").props("no-caps")
+            tab_history  = ui.tab("📋   History").props("no-caps")
+            tab_library  = ui.tab("🗂️   Library").props("no-caps")
+            tab_clients  = ui.tab("👤   Clients").props("no-caps")
+            with ui.tab("📥   Requests").props("no-caps") as tab_requests:
+                if _pending_n > 0:
+                    ui.badge(str(_pending_n), color="red").props("floating")
 
         selections = {}
 
@@ -120,3 +133,6 @@ def create_main_page():
 
             with ui.tab_panel(tab_clients):
                 create_client_view()
+
+            with ui.tab_panel(tab_requests):
+                create_request_queue()

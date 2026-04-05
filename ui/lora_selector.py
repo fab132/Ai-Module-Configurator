@@ -48,12 +48,12 @@ def create_configurator() -> dict:
                 with ui.element("div").classes("param-card p-6 flex flex-col gap-3"):
                     ui.label(f"{icon}  {label}").classes(
                         "text-sm font-bold uppercase tracking-widest"
-                    ).style("color: #a78bfa")
+                    ).style("color: #60A5FA")
                     sel = ui.select(
                         options=options,
                         label="Select...",
                         with_input=True,
-                    ).classes("w-full").props("outlined dark color=deep-purple-3")
+                    ).classes("w-full").props("outlined dark color=blue-4")
                     selections[key] = sel
 
                     if key == "person" and not options:
@@ -65,7 +65,7 @@ def create_configurator() -> dict:
         with ui.element("div").classes("param-card p-6 mb-6").style("max-width: 420px"):
             ui.label("📋  Customer / Project").classes(
                 "text-sm font-bold uppercase tracking-widest mb-3 block"
-            ).style("color: #a78bfa")
+            ).style("color: #60A5FA")
             customer_input = ui.input("Customer or project name").classes("w-full").props(
                 "outlined dense dark color=deep-purple-3"
             )
@@ -104,8 +104,6 @@ def create_configurator() -> dict:
                 finally:
                     db.close()
 
-            ui.button("⚡  RUN", on_click=handle_run).classes(
-                "run-btn text-white font-bold tracking-widest"
-            )
+            ui.button("⚡  RUN", on_click=handle_run).classes("run-btn")
 
     return selections

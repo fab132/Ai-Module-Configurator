@@ -83,8 +83,12 @@ def create_library_view():
                                     dlg.open()
                                 return do_delete
 
-                            ui.button("Edit", on_click=make_edit(m.id, m.name, m.category, m.file_path)).props("flat color=deep-purple-3 dense")
-                            ui.button("Delete", on_click=make_delete(m.id, m.name)).props("flat color=red dense")
+                            ui.button("✏", on_click=make_edit(m.id, m.name, m.category, m.file_path)).props("unelevated dense").style(
+                                "background:#3B82F6;color:white;min-width:32px;padding:0 8px;border-radius:4px"
+                            )
+                            ui.button("✕", on_click=make_delete(m.id, m.name)).props("unelevated dense").style(
+                                "background:#EF4444;color:white;min-width:32px;padding:0 8px;border-radius:4px"
+                            )
 
         # Add new model form
         with ui.element("div").classes("param-card p-6"):
@@ -113,6 +117,8 @@ def create_library_view():
                 finally:
                     db.close()
 
-            ui.button("+ Add Model", on_click=add_model).classes("mt-3").props("unelevated color=deep-purple")
+            ui.button("+ Add", on_click=add_model).classes("mt-3").props("unelevated").style(
+                "background:#10B981;color:white;border-radius:6px;font-weight:700"
+            )
 
         load_models()

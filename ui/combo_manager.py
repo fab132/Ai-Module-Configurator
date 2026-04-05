@@ -67,8 +67,12 @@ def create_combo_manager(selections: dict = None):
                                         ui.notify(f'Template "{template_name}" deleted', type="warning", position="top")
                                     return do_delete
 
-                                ui.button("Load", on_click=make_load(tparams)).props("flat color=deep-purple-3 dense")
-                                ui.button("Delete", on_click=make_delete(tname)).props("flat color=red dense")
+                                ui.button("Load", on_click=make_load(tparams)).props("unelevated dense").style(
+                                    "background:#3B82F6;color:white;border-radius:6px;font-weight:700"
+                                )
+                                ui.button("Delete", on_click=make_delete(tname)).props("unelevated dense").style(
+                                    "background:#EF4444;color:white;border-radius:6px;font-weight:700"
+                                )
 
                         # Show params summary
                         with ui.row().classes("flex-wrap gap-2 mt-2"):
@@ -105,6 +109,8 @@ def create_combo_manager(selections: dict = None):
                 refresh_list()
                 ui.notify(f'Template "{name}" saved!', type="positive", position="top")
 
-            ui.button("💾 Save Template", on_click=save_current).classes("mt-3").props("unelevated color=deep-purple")
+            ui.button("💾 Save Template", on_click=save_current).classes("mt-3").props("unelevated").style(
+                "background:#10B981;color:white;border-radius:6px;font-weight:700"
+            )
 
         refresh_list()

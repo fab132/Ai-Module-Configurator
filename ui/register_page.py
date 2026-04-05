@@ -1,25 +1,26 @@
 from nicegui import ui, app
 
 CUSTOM_CSS = """
-    body, .q-page { background: #0a0a14 !important; }
+    body, .q-page { background: #0f0f23 !important; }
     .auth-card {
-        background: linear-gradient(135deg, #13132b 0%, #1a1a35 100%);
-        border: 1px solid rgba(139, 92, 246, 0.25);
-        border-radius: 18px;
+        background: #1a1a3e;
+        border: 1px solid #2d2d5e;
+        border-radius: 12px;
     }
     .auth-btn {
-        background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%) !important;
-        letter-spacing: 0.12em !important;
+        background: #3B82F6 !important;
+        letter-spacing: 0.08em !important;
         transition: all 0.2s ease !important;
-        border-radius: 12px !important;
+        border-radius: 8px !important;
+        font-weight: 700 !important;
     }
     .auth-btn:hover {
-        background: linear-gradient(135deg, #6d28d9 0%, #4338ca 100%) !important;
-        box-shadow: 0 0 40px rgba(124, 58, 237, 0.5) !important;
+        background: #2563EB !important;
+        box-shadow: 0 0 30px rgba(59,130,246,0.45) !important;
     }
     .aivp-header {
-        background: linear-gradient(135deg, #12022f 0%, #0a0a14 100%);
-        border-bottom: 1px solid rgba(139, 92, 246, 0.25);
+        background: #16213e;
+        border-bottom: 1px solid #2a2a4a;
     }
 """
 
