@@ -14,6 +14,10 @@ def _run_migrations():
     migrations = [
         "ALTER TABLE clients ADD COLUMN lora_weight FLOAT DEFAULT 0.8",
         "ALTER TABLE clients ADD COLUMN negative_prompt TEXT DEFAULT ''",
+        "ALTER TABLE clients ADD COLUMN training_status TEXT DEFAULT 'none'",
+        "ALTER TABLE run_logs ADD COLUMN status TEXT DEFAULT 'pending'",
+        "ALTER TABLE run_logs ADD COLUMN output_file TEXT",
+        "ALTER TABLE run_logs ADD COLUMN operator_notes TEXT DEFAULT ''",
     ]
     with engine.connect() as conn:
         for sql in migrations:

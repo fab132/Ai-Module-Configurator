@@ -5,7 +5,10 @@ from nicegui import ui, app, events
 from models.database import SessionLocal
 from models.entities import RunLog, Client, ClientPhoto
 from services import profile_service, client_service
-from ui.shared_styles import SHARED_CSS, AVATAR_PLACEHOLDER, COVER_GRADIENT, ACCENT_LOGO, TEXT_MUTED, BG_PAGE
+from ui.shared_styles import (
+    SHARED_CSS, AVATAR_PLACEHOLDER, COVER_GRADIENT,
+    ACCENT_LOGO, ACCENT_BLUE, TEXT_MUTED, BG_PAGE, BTN_PRIMARY, BTN_SUCCESS
+)
 
 PICS_DIR = Path("data/profile_pics")
 COVERS_DIR = Path("data/profile_covers")
@@ -19,7 +22,6 @@ PHOTO_CATEGORIES = [
     ("body",  "👤  Body Reference",  "Full body, half body shots — used for pose and outfit generation"),
     ("style", "🎨  Style Reference", "Outfit inspiration, mood boards — defines your aesthetic"),
 ]
-
 
 
 def _avatar_url(profile, email, client=None) -> str:
@@ -45,9 +47,6 @@ def create_customer_portal():
         if not app.storage.user.get("authenticated"):
             ui.navigate.to("/login")
             return
-        if app.storage.user.get("role") not in ("Customer", None):
-            # not a customer — shouldn't be here
-            pass
 
         ui.dark_mode().enable()
         ui.add_css(SHARED_CSS)
@@ -65,75 +64,21 @@ def create_customer_portal():
                     ui.navigate.to("/login")
                 ui.button("Sign out", on_click=logout).props("flat color=grey-5 dense")
 
-        # Load data
-        db = SessionLocal()
-        try:
-            profile = profile_service.get_or_create(db, email) if email else None
-            client = db.query(Client).filter(Client.email == email).first()
-        finally:
-            db.close()
-
-        # ── Cover + Avatar ───────────────────────────────────────────────────
-        cover_container = ui.element("div").classes("cover-wrap")
-
-        def render_cover():
-            cover_container.clear()
-            db2 = SessionLocal()
-            try:
-                p = profile_service.get_or_create(db2, email) if email else None
-                c = db2.query(Client).filter(Client.email == email).first()
-            finally:
-                db2.close()
-            with cover_container:
-                ui.element("div").style(_cover_style(p))
-                with ui.element("div").style(
-                    "position:absolute;bottom:0;left:0;right:0;height:70px;"
-                    "background:linear-gradient(to top,#0a0a14 0%,transparent 100%);"
-                ):
-                    pass
-                with ui.element("div").classes("avatar-ring"):
-                    ui.image(_avatar_url(p, email, c)).style("width:100%;height:100%;object-fit:cover;")
-
-        render_cover()
-
-        # ── Name + badge ─────────────────────────────────────────────────────
-        info_container = ui.element("div").classes("px-10").style("padding-top:66px")
-
-        def render_info():
-            info_container.clear()
-            db3 = SessionLocal()
-            try:
-                p = profile_service.get_or_create(db3, email) if email else None
-                c = db3.query(Client).filter(Client.email == email).first()
-            finally:
-                db3.close()
-            display_name = (c.name if c else None) or (p.full_name if p else None) or email
-            with info_container:
-                with ui.row().classes("items-center gap-3"):
-                    ui.label(display_name).classes("text-white font-black").style("font-size:1.6rem")
-                    ui.element("span").style(
-                        "background:#7c3aed;color:white;font-size:0.72rem;font-weight:700;"
-                        "padding:3px 12px;border-radius:99px;letter-spacing:0.06em"
-                    ).text = "Customer"
-                ui.label(f"@{email}").style("color:#6b7280;font-size:0.85rem;margin-top:2px")
-
-        render_info()
-
-        # ── Tabs ─────────────────────────────────────────────────────────────
-        with ui.tabs().classes("w-full mt-6").props("dense align=left") as tabs:
-            tab_request = ui.tab("⚡   Request Production").props("no-caps")
+        # ── Tabs (right after header, same as admin) ─────────────────────────
+        with ui.tabs().classes("w-full").props("dense align=left") as tabs:
             tab_profile = ui.tab("🪪   My Profile").props("no-caps")
+            tab_request = ui.tab("⚡   Request Production").props("no-caps")
             tab_photos  = ui.tab("📸   My Photos").props("no-caps")
             tab_history = ui.tab("🎬   My Productions").props("no-caps")
 
-        with ui.tab_panels(tabs, value=tab_request).classes("w-full"):
+        with ui.tab_panels(tabs, value=tab_profile).classes("w-full"):
 
             # ── REQUEST PRODUCTION ────────────────────────────────────────────
             with ui.tab_panel(tab_request):
                 with ui.element("div").classes("p-8 w-full max-w-4xl mx-auto"):
                     ui.label("Request a Production").classes("text-white font-bold mb-1").style("font-size:1.2rem")
                     ui.label("Choose your preferences below and submit — our team will produce your content.").style(
-                        "color:#6b7280; font-size:0.86rem; margin-bottom:2rem"
+                        f"color:{TEXT_MUTED}; font-size:0.86rem; margin-bottom:2rem"
                     )
 
                     from services.config_loader import get_options
@@ -159,32 +104,32 @@ def create_customer_portal():
                     with ui.element("div").style(
                         "display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:1.2rem; margin-bottom:1.5rem"
                     ):
-                        # Person card — pre-filled, read-only
                         with ui.element("div").classes("param-card p-5 flex flex-col gap-2"):
-                            ui.label("👤  Person").style("color:#a78bfa; font-size:0.8rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase")
+                            ui.label("👤  Person").style(
+                                f"color:{ACCENT_BLUE}; font-size:0.8rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase"
+                            )
                             with ui.row().classes("items-center gap-2"):
                                 ui.label(client_name).classes("text-white font-semibold").style("font-size:0.95rem")
-                                ui.badge("You").props("color=deep-purple-9 text-color=white")
+                                ui.badge("You").props("color=blue-9 text-color=white")
 
                         for key, label, icon in REQUEST_PARAMS:
                             options = get_options(key)
                             with ui.element("div").classes("param-card p-5 flex flex-col gap-2"):
                                 ui.label(f"{icon}  {label}").style(
-                                    "color:#a78bfa; font-size:0.8rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase"
+                                    f"color:{ACCENT_BLUE}; font-size:0.8rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase"
                                 )
                                 s = ui.select(
                                     options=options, label="Select...", with_input=True
-                                ).classes("w-full").props("outlined dark dense color=deep-purple-3")
+                                ).classes("w-full").props("outlined dark dense color=blue-4")
                                 sel[key] = s
 
-                    # Notes field
                     with ui.element("div").classes("param-card p-5 mb-6"):
                         ui.label("📝  Additional Notes").style(
-                            "color:#a78bfa; font-size:0.8rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.5rem; display:block"
+                            f"color:{ACCENT_BLUE}; font-size:0.8rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.5rem; display:block"
                         )
                         notes_input = ui.textarea(
                             placeholder="Any specific instructions, preferences, or details for the production team..."
-                        ).classes("w-full").props("outlined dark dense color=deep-purple-3 rows=3")
+                        ).classes("w-full").props("outlined dark dense color=blue-4 rows=3")
 
                     submit_err = ui.label("").style("color:#f87171; font-size:0.85rem; min-height:1rem")
 
@@ -196,13 +141,11 @@ def create_customer_portal():
                         submit_err.set_text("")
                         params = {key: sel[key].value for key, _, _ in REQUEST_PARAMS}
                         params["person"] = client_name
-
                         from services.configurator import run as cfg_run
                         db_s = SessionLocal()
                         try:
                             cfg_run(db_s, params=params, customer=client_name,
                                     combo_name=notes_input.value or None, send_to_api=False)
-                            # Reset dropdowns
                             for s in sel.values():
                                 s.set_value(None)
                             notes_input.set_value("")
@@ -213,15 +156,16 @@ def create_customer_portal():
                             db_s.close()
 
                     with ui.row().classes("justify-center mt-2"):
-                        ui.button("⚡  Submit Request", on_click=submit_request).props(
-                            "unelevated color=deep-purple"
-                        ).style(
-                            "font-size:1.1rem; padding:0.9rem 4rem; border-radius:14px; letter-spacing:0.12em; font-weight:700"
+                        ui.button("⚡  Submit Request", on_click=submit_request).props("unelevated").style(
+                            f"background:{BTN_PRIMARY};color:white;font-size:1.1rem;padding:0.9rem 4rem;border-radius:14px;letter-spacing:0.12em;font-weight:700"
                         )
 
             # ── MY PROFILE ────────────────────────────────────────────────────
             with ui.tab_panel(tab_profile):
-                profile_panel = ui.element("div").classes("p-8 w-full max-w-xl mx-auto")
+                profile_panel = ui.element("div").classes("w-full")
+
+                pic_holder   = {"path": None}
+                cover_holder = {"path": None}
 
                 def render_profile_panel():
                     profile_panel.clear()
@@ -231,78 +175,116 @@ def create_customer_portal():
                         c = db4.query(Client).filter(Client.email == email).first()
                     finally:
                         db4.close()
+
+                    display_name = (c.name if c else None) or (p.full_name if p else None) or email
+
                     with profile_panel:
-                        with ui.element("div").classes("param-card p-6"):
-                            ui.label("Personal Info").classes("text-white font-bold mb-5 block").style(
-                                "font-size:1rem; text-transform:uppercase; letter-spacing:0.06em"
-                            )
-                            f_name  = ui.input("Your Name", value=c.name if c else "").classes("w-full").props("outlined dark dense color=deep-purple-3")
-                            f_bio   = ui.textarea("About Me", value=p.bio if p else "").classes("w-full mt-4").props("outlined dark dense color=deep-purple-3 rows=3")
-                            f_notes = ui.textarea("Special Notes for Production", value=c.notes if c else "").classes("w-full mt-4").props(
-                                "outlined dark dense color=deep-purple-3 rows=2"
-                            )
-                            ui.label("e.g. allergies, preferred styles, restrictions").style("color:#6b7280;font-size:0.75rem;margin-top:-0.3rem")
+                        # ── Cover photo with overlay "Change Cover" button ──────
+                        with ui.element("div").classes("profile-cover-wrap"):
+                            ui.element("div").style(_cover_style(p))
+                            ui.element("div").classes("profile-cover-overlay")
 
-                            ui.label("Profile Photo").classes("text-white text-sm mt-5 mb-2 block font-semibold")
-                            pic_holder = {"path": None}
-
-                            def handle_pic(e: events.UploadEventArguments):
-                                ext = Path(e.name).suffix or ".jpg"
-                                dest = CLIENT_PICS_DIR / f"{uuid.uuid4().hex}{ext}"
-                                dest.write_bytes(e.content.read())
-                                pic_holder["path"] = str(dest)
-                                ui.notify("Photo uploaded ✓", type="positive", position="top")
-
-                            ui.upload(
-                                on_upload=handle_pic, label="Upload profile photo",
-                                max_file_size=5_000_000, auto_upload=True
-                            ).props("accept=image/* flat color=deep-purple-3").classes("w-full")
-
-                            ui.label("Cover Photo").classes("text-white text-sm mt-4 mb-2 block font-semibold")
-                            cover_holder = {"path": None}
-
-                            def handle_cover(e: events.UploadEventArguments):
-                                ext = Path(e.name).suffix or ".jpg"
-                                dest = COVERS_DIR / f"cover_{uuid.uuid4().hex}{ext}"
-                                dest.write_bytes(e.content.read())
-                                cover_holder["path"] = str(dest)
-                                ui.notify("Cover uploaded ✓", type="positive", position="top")
-
-                            ui.upload(
-                                on_upload=handle_cover, label="Upload cover photo",
-                                max_file_size=8_000_000, auto_upload=True
-                            ).props("accept=image/* flat color=deep-purple-3").classes("w-full")
-
-                            err = ui.label("").style("color:#f87171;font-size:0.82rem;min-height:1rem;margin-top:0.3rem")
-
-                            def save_profile():
-                                db5 = SessionLocal()
-                                try:
-                                    profile_service.update(
-                                        db5, email,
-                                        full_name=f_name.value,
-                                        bio=f_bio.value,
-                                        profile_picture=pic_holder["path"],
-                                        cover_picture=cover_holder["path"],
-                                    )
-                                    c2 = db5.query(Client).filter(Client.email == email).first()
-                                    if c2:
-                                        client_service.update(
-                                            db5, c2.id,
-                                            name=f_name.value or c2.name,
-                                            notes=f_notes.value or None,
-                                            profile_picture=pic_holder["path"],
-                                        )
-                                    ui.notify("Profile saved!", type="positive", position="top")
-                                    render_cover()
-                                    render_info()
+                            # "Change Cover" button top-right
+                            with ui.element("div").classes("edit-cover-btn"):
+                                ui.label("📷  Change Cover")
+                                cover_upload = ui.upload(
+                                    label="",
+                                    max_file_size=8_000_000,
+                                    auto_upload=True,
+                                ).props("accept=image/* flat color=white").style(
+                                    "position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%"
+                                )
+                                def handle_cover(e: events.UploadEventArguments):
+                                    ext = Path(e.name).suffix or ".jpg"
+                                    dest = COVERS_DIR / f"cover_{uuid.uuid4().hex}{ext}"
+                                    dest.write_bytes(e.content.read())
+                                    cover_holder["path"] = str(dest)
+                                    db_c = SessionLocal()
+                                    try:
+                                        profile_service.update(db_c, email, cover_picture=str(dest))
+                                    finally:
+                                        db_c.close()
+                                    ui.notify("Cover updated ✓", type="positive", position="top")
                                     render_profile_panel()
-                                except Exception as ex:
-                                    err.set_text(str(ex))
-                                finally:
-                                    db5.close()
+                                cover_upload.on_upload(handle_cover)
 
-                            ui.button("💾  Save Profile", on_click=save_profile).classes("w-full mt-5").props("unelevated color=deep-purple")
+                            # Avatar with click-to-change
+                            with ui.element("div").classes("profile-avatar-ring").style("cursor:pointer").tooltip("Click to change photo"):
+                                ui.image(_avatar_url(p, email, c)).style("width:100%;height:100%;object-fit:cover;")
+                                avatar_upload = ui.upload(
+                                    label="",
+                                    max_file_size=5_000_000,
+                                    auto_upload=True,
+                                ).props("accept=image/* flat").style(
+                                    "position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%"
+                                )
+                                def handle_pic(e: events.UploadEventArguments):
+                                    ext = Path(e.name).suffix or ".jpg"
+                                    dest = CLIENT_PICS_DIR / f"{uuid.uuid4().hex}{ext}"
+                                    dest.write_bytes(e.content.read())
+                                    pic_holder["path"] = str(dest)
+                                    db_p2 = SessionLocal()
+                                    try:
+                                        profile_service.update(db_p2, email, profile_picture=str(dest))
+                                        c2 = db_p2.query(Client).filter(Client.email == email).first()
+                                        if c2:
+                                            client_service.update(db_p2, c2.id, profile_picture=str(dest))
+                                    finally:
+                                        db_p2.close()
+                                    ui.notify("Profile photo updated ✓", type="positive", position="top")
+                                    render_profile_panel()
+                                avatar_upload.on_upload(handle_pic)
+
+                        # ── Name + badge ────────────────────────────────────────
+                        with ui.element("div").classes("px-10").style("padding-top:70px"):
+                            with ui.row().classes("items-center gap-3 mb-1"):
+                                ui.label(display_name).classes("text-white font-black").style("font-size:1.6rem")
+                                ui.element("span").style(
+                                    f"background:{BTN_PRIMARY};color:white;font-size:0.72rem;font-weight:700;"
+                                    "padding:3px 12px;border-radius:99px;letter-spacing:0.06em"
+                                ).text = "Customer"
+                            ui.label(f"@{email}").style(f"color:{TEXT_MUTED};font-size:0.85rem")
+
+                        # ── Edit form ───────────────────────────────────────────
+                        with ui.element("div").classes("p-8 w-full max-w-xl"):
+                            with ui.element("div").classes("param-card p-6"):
+                                ui.label("Personal Info").classes("text-white font-bold mb-5 block").style(
+                                    "font-size:1rem; text-transform:uppercase; letter-spacing:0.06em"
+                                )
+                                f_name  = ui.input("Your Name", value=c.name if c else "").classes("w-full").props("outlined dark dense color=blue-4")
+                                f_bio   = ui.textarea("About Me", value=p.bio if p else "").classes("w-full mt-4").props("outlined dark dense color=blue-4 rows=3")
+                                f_notes = ui.textarea("Special Notes for Production", value=c.notes if c else "").classes("w-full mt-4").props(
+                                    "outlined dark dense color=blue-4 rows=2"
+                                )
+                                ui.label("e.g. allergies, preferred styles, restrictions").style(f"color:{TEXT_MUTED};font-size:0.75rem;margin-top:-0.3rem")
+
+                                err = ui.label("").style("color:#f87171;font-size:0.82rem;min-height:1rem;margin-top:1rem")
+
+                                def save_profile():
+                                    db5 = SessionLocal()
+                                    try:
+                                        profile_service.update(
+                                            db5, email,
+                                            full_name=f_name.value,
+                                            bio=f_bio.value,
+                                        )
+                                        c2 = db5.query(Client).filter(Client.email == email).first()
+                                        if c2:
+                                            client_service.update(
+                                                db5, c2.id,
+                                                name=f_name.value or c2.name,
+                                                notes=f_notes.value or None,
+                                            )
+                                        ui.notify("Profile saved!", type="positive", position="top")
+                                        render_profile_panel()
+                                    except Exception as ex:
+                                        err.set_text(str(ex))
+                                    finally:
+                                        db5.close()
+
+                                ui.button("💾  Save Profile", on_click=save_profile).classes("w-full mt-5").props("unelevated").style(
+                                    f"background:{BTN_SUCCESS};color:white"
+                                )
 
                 render_profile_panel()
 
@@ -317,7 +299,7 @@ def create_customer_portal():
                         c = db6.query(Client).filter(Client.email == email).first()
                         if not c:
                             with photos_panel:
-                                ui.label("Your client profile is being set up. Check back soon.").style("color:#6b7280")
+                                ui.label("Your client profile is being set up. Check back soon.").style(f"color:{TEXT_MUTED}")
                             return
                         cat_data = {cat: client_service.get_photos(db6, c.id, cat) for cat, _, _ in PHOTO_CATEGORIES}
                         client_id = c.id
@@ -329,7 +311,7 @@ def create_customer_portal():
                         ui.label(
                             "These photos are used by our production team to create your personalised avatar and visual content. "
                             "Upload at least 5 face photos and 3 body photos for best results."
-                        ).style("color:#6b7280;font-size:0.86rem;margin-bottom:1.5rem;line-height:1.5")
+                        ).style(f"color:{TEXT_MUTED};font-size:0.86rem;margin-bottom:1.5rem;line-height:1.5")
 
                         with ui.row().classes("gap-6 w-full items-start").style("flex-wrap:wrap"):
                             for cat_key, cat_label, cat_tip in PHOTO_CATEGORIES:
@@ -337,16 +319,16 @@ def create_customer_portal():
                                 with ui.element("div").classes("param-card p-5").style("min-width:260px; flex:1"):
                                     with ui.row().classes("items-center justify-between mb-1"):
                                         ui.label(cat_label).classes("text-white font-semibold").style("font-size:0.95rem")
-                                        ui.badge(str(len(photos))).props("color=deep-purple-9 text-color=white")
-                                    ui.label(cat_tip).style("color:#6b7280;font-size:0.75rem;margin-bottom:1rem;line-height:1.4")
+                                        ui.badge(str(len(photos))).props("color=blue-9 text-color=white")
+                                    ui.label(cat_tip).style(f"color:{TEXT_MUTED};font-size:0.75rem;margin-bottom:1rem;line-height:1.4")
 
                                     if photos:
                                         with ui.element("div").style(
                                             "display:grid;grid-template-columns:repeat(auto-fill,minmax(85px,1fr));gap:8px;margin-bottom:12px"
                                         ):
-                                            for p in photos:
+                                            for ph in photos:
                                                 with ui.element("div").classes("photo-thumb").style("height:85px"):
-                                                    ui.image(f"/client_refs/{Path(p.file_path).name}").style(
+                                                    ui.image(f"/client_refs/{Path(ph.file_path).name}").style(
                                                         "width:100%;height:100%;object-fit:cover;"
                                                     )
                                                     def make_del(pid):
@@ -358,7 +340,7 @@ def create_customer_portal():
                                                                 db7.close()
                                                             render_photos()
                                                         return do
-                                                    with ui.element("div").classes("photo-del").on("click", make_del(p.id)):
+                                                    with ui.element("div").classes("photo-del").on("click", make_del(ph.id)):
                                                         ui.label("✕")
 
                                     def make_uploader(category, cid):
@@ -381,7 +363,7 @@ def create_customer_portal():
                                         max_file_size=8_000_000,
                                         auto_upload=True,
                                         multiple=True,
-                                    ).props("accept=image/* flat color=deep-purple-3").classes("w-full")
+                                    ).props("accept=image/* flat color=blue-4").classes("w-full")
 
                 render_photos()
 
@@ -389,7 +371,7 @@ def create_customer_portal():
             with ui.tab_panel(tab_history):
                 with ui.element("div").classes("p-8 w-full max-w-4xl mx-auto"):
                     ui.label("My Productions").classes("text-white font-bold mb-2").style("font-size:1.2rem")
-                    ui.label("Visual content produced for you by our team.").style("color:#6b7280;font-size:0.86rem;margin-bottom:1.5rem")
+                    ui.label("Visual content produced for you by our team.").style(f"color:{TEXT_MUTED};font-size:0.86rem;margin-bottom:1.5rem")
 
                     prod_container = ui.element("div").classes("w-full")
 
@@ -400,7 +382,7 @@ def create_customer_portal():
                             c = db9.query(Client).filter(Client.email == email).first()
                             if not c:
                                 with prod_container:
-                                    ui.label("No productions yet.").style("color:#6b7280")
+                                    ui.label("No productions yet.").style(f"color:{TEXT_MUTED}")
                                 return
                             logs = db9.query(RunLog).filter(RunLog.customer == c.name).order_by(RunLog.ran_at.desc()).all()
                         finally:
@@ -411,7 +393,7 @@ def create_customer_portal():
                                 with ui.element("div").classes("param-card p-8 text-center"):
                                     ui.label("🎬").style("font-size:2.5rem")
                                     ui.label("No productions yet").classes("text-white font-semibold mt-2")
-                                    ui.label("Once our team produces content for you, it will appear here.").style("color:#6b7280;font-size:0.86rem;margin-top:4px")
+                                    ui.label("Once our team produces content for you, it will appear here.").style(f"color:{TEXT_MUTED};font-size:0.86rem;margin-top:4px")
                                 return
 
                             STATUS_STYLE = {
@@ -426,13 +408,10 @@ def create_customer_portal():
                                 except Exception:
                                     meta = {}
 
-                                s_label, s_color, s_bg = STATUS_STYLE.get(
-                                    log.status, STATUS_STYLE["pending"]
-                                )
-                                border_color = s_color
+                                s_label, s_color, s_bg = STATUS_STYLE.get(log.status, STATUS_STYLE["pending"])
 
                                 with ui.element("div").classes("param-card p-5 mb-3").style(
-                                    f"border-left: 4px solid {border_color};"
+                                    f"border-left: 4px solid {s_color};"
                                 ):
                                     with ui.row().classes("items-center justify-between mb-2 flex-wrap gap-2"):
                                         with ui.row().classes("gap-3 flex-wrap"):
@@ -444,17 +423,16 @@ def create_customer_portal():
                                                 ("Lighting", meta.get("lighting")),
                                             ]:
                                                 if v:
-                                                    ui.badge(f"{k}: {v}").props("color=deep-purple-9 text-color=white")
+                                                    ui.badge(f"{k}: {v}").props("color=blue-9 text-color=white")
 
                                         with ui.row().classes("items-center gap-3 flex-shrink-0"):
                                             ui.element("span").style(
                                                 f"background:{s_bg};color:{s_color};border:1px solid {s_color};"
                                                 "border-radius:99px;padding:3px 12px;font-size:0.75rem;font-weight:700;"
-                                                "letter-spacing:0.05em;"
                                             ).text = s_label
                                             ui.label(
                                                 log.ran_at.strftime("%d %b %Y  %H:%M") if log.ran_at else "—"
-                                            ).style("color:#6b7280;font-size:0.8rem")
+                                            ).style(f"color:{TEXT_MUTED};font-size:0.8rem")
 
                                     if log.operator_notes:
                                         ui.label(f"📝 {log.operator_notes}").style(
@@ -468,7 +446,8 @@ def create_customer_portal():
                                                 "color:#10b981;font-size:0.88rem;font-weight:600"
                                             )
                                             ui.button(
-                                                "⬇️  Download", on_click=lambda p=f"/outputs/{output_name}": ui.navigate.to(p, new_tab=True)
+                                                "⬇️  Download",
+                                                on_click=lambda p=f"/outputs/{output_name}": ui.navigate.to(p, new_tab=True)
                                             ).props("unelevated color=green-8 dense")
 
                     load_productions()

@@ -5,10 +5,10 @@ from services.history_service import get_all
 
 
 def create_history_view():
-    with ui.element("div").classes("p-8 w-full max-w-6xl mx-auto"):
+    with ui.element("div").classes("p-8 w-full max-w-4xl mx-auto"):
         with ui.row().classes("items-center justify-between mb-6"):
             ui.label("Run History").classes("text-white font-bold").style("font-size: 1.4rem")
-            refresh_btn = ui.button("↻ Refresh", icon="refresh").props("flat color=deep-purple-3")
+            refresh_btn = ui.button("↻ Refresh").props("flat dense").style("color:#6B7280")
 
         table_container = ui.element("div").classes("w-full")
 
@@ -22,44 +22,41 @@ def create_history_view():
 
             with table_container:
                 if not logs:
-                    with ui.element("div").classes("p-10 text-center").style("color: #6b7280"):
+                    with ui.element("div").classes("p-10 text-center").style("color:#6b7280"):
                         ui.label("No runs yet. Configure and trigger a run to see history here.")
                     return
 
-                columns = [
-                    {"name": "ran_at", "label": "Timestamp", "field": "ran_at", "align": "left", "sortable": True},
-                    {"name": "customer", "label": "Customer / Project", "field": "customer", "align": "left"},
-                    {"name": "combo_name", "label": "Template", "field": "combo_name", "align": "left"},
-                    {"name": "person", "label": "Person", "field": "person", "align": "left"},
-                    {"name": "platform", "label": "Platform", "field": "platform", "align": "left"},
-                    {"name": "format", "label": "Format", "field": "format", "align": "left"},
-                ]
+                # Table wrapper
+                with ui.element("div").style(
+                    "border-radius:8px; overflow:hidden; border:1px solid #2a2a4a"
+                ):
+                    # Header row
+                    with ui.element("div").style(
+                        "display:grid; grid-template-columns:60px 1fr 1fr 1fr;"
+                        "background:#16213e; padding:10px 16px; border-bottom:1px solid #2a2a4a"
+                    ):
+                        for col in ["Run", "Timestamp", "Person", "Platform"]:
+                            ui.label(col).style(
+                                "color:#9CA3AF; font-size:0.82rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em"
+                            )
 
-                rows = []
-                for log in logs:
-                    try:
-                        cfg = json.loads(log.config_json)
-                        meta = cfg.get("_meta", {})
-                    except Exception:
-                        meta = {}
-                    rows.append({
-                        "id": log.id,
-                        "ran_at": log.ran_at.strftime("%Y-%m-%d %H:%M:%S") if log.ran_at else "—",
-                        "customer": log.customer or "—",
-                        "combo_name": log.combo_name or "—",
-                        "person": meta.get("person", "—"),
-                        "platform": meta.get("platform", "—"),
-                        "format": meta.get("format", "—"),
-                    })
+                    # Data rows
+                    for i, log in enumerate(logs):
+                        try:
+                            meta = json.loads(log.config_json).get("_meta", {})
+                        except Exception:
+                            meta = {}
 
-                ui.table(
-                    columns=columns,
-                    rows=rows,
-                    row_key="id",
-                    pagination={"rowsPerPage": 15},
-                ).classes("w-full").props("dark flat bordered").style(
-                    "background:#1a1a3e; border:1px solid #2a2a4a; border-radius:8px"
-                )
+                        row_bg = "#1a1a3e" if i % 2 == 0 else "#0f0f23"
+                        with ui.element("div").style(
+                            f"display:grid; grid-template-columns:60px 1fr 1fr 1fr;"
+                            f"background:{row_bg}; padding:10px 16px;"
+                            f"border-bottom:1px solid #2a2a4a"
+                        ):
+                            ui.label(str(log.id)).style("color:white; font-size:0.88rem; font-weight:600")
+                            ui.label(log.ran_at.strftime("%Y-%m-%d %H:%M") if log.ran_at else "—").style("color:#D1D5DB; font-size:0.88rem")
+                            ui.label(meta.get("person", "—")).style("color:#D1D5DB; font-size:0.88rem")
+                            ui.label(meta.get("platform", "—")).style("color:#D1D5DB; font-size:0.88rem")
 
         refresh_btn.on("click", load_data)
         load_data()

@@ -46,6 +46,9 @@ class RunLog(Base):
     combo_name = Column(String)
     config_json = Column(String, nullable=False)
     ran_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    status = Column(String, default="pending")          # pending | in_progress | done
+    output_file = Column(String)                        # path to generated file
+    operator_notes = Column(String, default="")
 
 class User(Base):
     __tablename__ = "users"
@@ -80,6 +83,7 @@ class Client(Base):
     prompt_prefix = Column(String, default="")
     negative_prompt = Column(String, default="")
     notes = Column(String)
+    training_status = Column(String, default="none")   # none | ready | training | trained
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
     photos = relationship("ClientPhoto", back_populates="client", cascade="all, delete-orphan")
 

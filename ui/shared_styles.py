@@ -12,7 +12,7 @@ BTN_DANGER    = "#EF4444"
 TEXT_PRIMARY  = "white"
 TEXT_SECONDARY = "#D1D5DB"
 TEXT_MUTED    = "#6B7280"
-COVER_GRADIENT = "linear-gradient(135deg, #0f0f23 0%, #16213e 60%, #1a1a3e 100%)"
+COVER_GRADIENT = "linear-gradient(135deg, #0d1b3e 0%, #1a2a5e 40%, #16213e 100%)"
 AVATAR_PLACEHOLDER = "https://ui-avatars.com/api/?background=3B82F6&color=fff&size=256&bold=true&name="
 
 # ── Shared CSS injected on every page ───────────────────────────────────────
