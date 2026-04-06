@@ -67,7 +67,7 @@ def create_configurator() -> dict:
                 "text-sm font-bold uppercase tracking-widest mb-3 block"
             ).style("color: #60A5FA")
             customer_input = ui.input("Customer or project name").classes("w-full").props(
-                "outlined dense dark color=deep-purple-3"
+                "outlined dense dark color=blue-4"
             )
 
         with ui.row().classes("w-full justify-center mt-6"):

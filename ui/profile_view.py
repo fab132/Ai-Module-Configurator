@@ -5,60 +5,14 @@ from nicegui import ui, app, events
 from models.database import SessionLocal
 from models.entities import RunLog, Client
 from services import profile_service
+from ui.shared_styles import SHARED_CSS, AVATAR_PLACEHOLDER, COVER_GRADIENT, ACCENT_BLUE, BTN_PRIMARY
 
 PICS_DIR = Path("data/profile_pics")
 COVERS_DIR = Path("data/profile_covers")
 PICS_DIR.mkdir(parents=True, exist_ok=True)
 COVERS_DIR.mkdir(parents=True, exist_ok=True)
 
-AVATAR_PLACEHOLDER = "https://ui-avatars.com/api/?background=7c3aed&color=fff&size=256&bold=true&name="
-COVER_GRADIENT = "linear-gradient(135deg, #12022f 0%, #1e1b4b 45%, #4c1d95 100%)"
-
-ROLE_COLORS = {"Admin": "#dc2626", "Operator": "#7c3aed"}
-
-PROFILE_CSS = """
-    .profile-cover-wrap { position: relative; }
-    .profile-cover-img  { width:100%; height:240px; object-fit:cover; display:block; }
-    .profile-cover-overlay {
-        position:absolute; bottom:0; left:0; right:0; height:80px;
-        background: linear-gradient(to top, #0a0a14 0%, transparent 100%);
-    }
-    .profile-avatar-ring {
-        position:absolute; bottom:-54px; left:48px;
-        width:112px; height:112px; border-radius:50%;
-        border:4px solid #0a0a14;
-        box-shadow: 0 0 0 3px rgba(139,92,246,0.6), 0 8px 32px rgba(124,58,237,0.4);
-        overflow:hidden; background:#1a1a35;
-    }
-    .stat-card {
-        background: linear-gradient(135deg, #13132b 0%, #1a1a35 100%);
-        border: 1px solid rgba(139,92,246,0.25);
-        border-radius:16px; padding:1.2rem 2rem;
-        text-align:center; min-width:120px;
-        transition: all 0.2s ease;
-    }
-    .stat-card:hover {
-        border-color: rgba(139,92,246,0.6);
-        transform: translateY(-3px);
-        box-shadow: 0 8px 24px rgba(124,58,237,0.2);
-    }
-    .about-row { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
-    .about-icon { font-size:1rem; width:22px; text-align:center; flex-shrink:0; }
-    .about-label { color:#6b7280; font-size:0.82rem; width:110px; flex-shrink:0; }
-    .about-value { color:#e5e7eb; font-size:0.86rem; }
-    .edit-cover-btn {
-        position:absolute; top:14px; right:14px;
-        background:rgba(0,0,0,0.55); border:1px solid rgba(255,255,255,0.15);
-        border-radius:10px; padding:5px 14px; cursor:pointer;
-        color:white; font-size:0.82rem; display:flex; align-items:center; gap:6px;
-        backdrop-filter: blur(4px);
-    }
-    .recent-run-row {
-        display:flex; align-items:center; justify-content:space-between;
-        padding:10px 0; border-bottom:1px solid rgba(139,92,246,0.1);
-    }
-    .recent-run-row:last-child { border-bottom: none; }
-"""
+ROLE_COLORS = {"Admin": "#dc2626", "Operator": "#3B82F6"}
 
 
 def _avatar_url(profile, email: str) -> str:
@@ -98,7 +52,7 @@ def _get_recent_runs(db, limit=5) -> list:
 
 def create_profile_view():
     email = app.storage.user.get("email", "")
-    ui.add_css(PROFILE_CSS)
+    ui.add_css(SHARED_CSS)
     container = ui.element("div").classes("w-full")
 
     def render():
@@ -168,8 +122,8 @@ def create_profile_view():
                             )
 
                     ui.button("✏️  Edit Profile", on_click=open_edit_dialog).props(
-                        "outlined color=deep-purple-3"
-                    ).style("margin-top:6px; flex-shrink:0")
+                        "outlined"
+                    ).style(f"margin-top:6px; flex-shrink:0; color:{ACCENT_BLUE}; border-color:{ACCENT_BLUE}")
 
             # ── Stats ────────────────────────────────────────────────────────
             with ui.row().classes("gap-5 px-12 mt-8"):
@@ -181,7 +135,7 @@ def create_profile_view():
                     with ui.element("div").classes("stat-card"):
                         ui.label(str(value)).classes("text-white font-black").style("font-size:2rem; line-height:1")
                         ui.label(f"{icon}  {label}").style(
-                            "color:#a78bfa; font-size:0.78rem; letter-spacing:0.08em; margin-top:6px"
+                            f"color:{ACCENT_BLUE}; font-size:0.78rem; letter-spacing:0.08em; margin-top:6px"
                         )
 
             # ── Two-column layout: About + Recent Activity ───────────────────
@@ -233,19 +187,18 @@ def create_profile_view():
         finally:
             db.close()
 
-        with ui.dialog() as dlg, ui.card().classes("w-full p-6").style(
-            "background:#13132b; border:1px solid rgba(139,92,246,0.3);"
+        with ui.dialog() as dlg, ui.card().classes("w-full p-6 aivp-dialog").style(
             "max-width:460px; max-height:90vh; overflow-y:auto;"
         ):
             ui.label("Edit Profile").classes("text-white font-bold mb-5").style("font-size:1.2rem")
 
             f_name = ui.input(
                 "Full Name", value=profile.full_name if profile else ""
-            ).classes("w-full").props("outlined dark dense color=deep-purple-3")
+            ).classes("w-full").props("outlined dark dense color=blue-4")
 
             f_bio = ui.textarea(
                 "Bio", value=profile.bio if profile else ""
-            ).classes("w-full mt-4").props("outlined dark dense color=deep-purple-3 rows=3")
+            ).classes("w-full mt-4").props("outlined dark dense color=blue-4 rows=3")
             ui.label("Tell people about yourself and your role in the team.").style(
                 "color:#6b7280; font-size:0.75rem; margin-top:-0.4rem"
             )
@@ -254,7 +207,7 @@ def create_profile_view():
                 options=["Operator", "Admin"],
                 label="Role",
                 value=profile.role if profile else "Operator",
-            ).classes("w-full mt-4").props("outlined dark dense color=deep-purple-3")
+            ).classes("w-full mt-4").props("outlined dark dense color=blue-4")
 
             ui.label("Profile Picture").classes("text-white text-sm mt-5 mb-2 block font-semibold")
             pic_holder = {"path": None}
@@ -269,7 +222,7 @@ def create_profile_view():
             ui.upload(
                 on_upload=handle_pic, label="Upload profile photo",
                 max_file_size=5_000_000, auto_upload=True,
-            ).props("accept=image/* flat color=deep-purple-3").classes("w-full")
+            ).props("accept=image/* flat color=blue-4").classes("w-full")
 
             err = ui.label("").style("color:#f87171; font-size:0.82rem; min-height:1rem; margin-top:4px")
 
@@ -293,7 +246,9 @@ def create_profile_view():
 
             with ui.row().classes("mt-6 justify-end gap-3"):
                 ui.button("Cancel", on_click=dlg.close).props("flat color=grey")
-                ui.button("Save Changes", on_click=save).props("unelevated color=deep-purple")
+                ui.button("Save Changes", on_click=save).props("unelevated").style(
+                    f"background:{BTN_PRIMARY};color:white"
+                )
 
         dlg.open()
 

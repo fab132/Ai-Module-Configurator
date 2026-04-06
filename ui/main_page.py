@@ -6,65 +6,9 @@ from ui.combo_manager import create_combo_manager
 from ui.client_view import create_client_view
 from ui.profile_view import create_profile_view
 from ui.request_queue import create_request_queue
+from ui.shared_styles import SHARED_CSS, ACCENT_LOGO, TEXT_MUTED
 from models.database import SessionLocal
 from services.history_service import count_pending
-
-CUSTOM_CSS = """
-    body, .q-page { background: #0f0f23 !important; }
-
-    .param-card {
-        background: #1a1a3e;
-        border: 1px solid #2d2d5e;
-        border-radius: 8px;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .param-card:hover {
-        border-color: #60A5FA;
-        box-shadow: 0 4px 20px rgba(96,165,250,0.12);
-    }
-
-    .run-btn {
-        background: #60A5FA !important;
-        letter-spacing: 0.18em !important;
-        transition: all 0.2s ease !important;
-        font-size: 1.1rem !important;
-        padding: 0.8rem 4rem !important;
-        border-radius: 22px !important;
-        color: white !important;
-        font-weight: 700 !important;
-    }
-    .run-btn:hover {
-        background: #3B82F6 !important;
-        box-shadow: 0 0 40px rgba(96,165,250,0.4) !important;
-    }
-
-    .aivp-header {
-        background: #16213e;
-        border-bottom: 1px solid #2a2a4a;
-    }
-
-    .q-tabs {
-        background: #16213e !important;
-        border-bottom: 1px solid #2a2a4a !important;
-    }
-    .q-tab--active .q-tab__label {
-        color: #60A5FA !important;
-        font-size: 1rem !important;
-    }
-    .q-tab--active {
-        border-bottom: 2px solid #60A5FA !important;
-    }
-    .q-tab__label {
-        color: #6B7280;
-        font-size: 1rem !important;
-    }
-    .q-tabs__content {
-        background: transparent !important;
-    }
-    .q-tab-panels {
-        background: transparent !important;
-    }
-"""
 
 
 def create_main_page():
@@ -77,17 +21,17 @@ def create_main_page():
             ui.navigate.to("/customer")
             return
         ui.dark_mode().enable()
-        ui.add_css(CUSTOM_CSS)
+        ui.add_css(SHARED_CSS)
 
         # ── Header ──────────────────────────────────────────────────────────
         with ui.element("div").classes("aivp-header w-full px-10 py-7"):
             with ui.row().classes("items-center justify-between"):
                 with ui.row().classes("items-center gap-4"):
-                    ui.label("⚡").style("font-size: 2.4rem; color: #7B68EE")
+                    ui.label("⚡").style(f"font-size:2.4rem; color:{ACCENT_LOGO}")
                     with ui.column().classes("gap-0"):
-                        ui.label("AIVP").classes("text-white font-black tracking-widest").style("font-size: 2rem")
+                        ui.label("AIVP").classes("text-white font-black tracking-widest").style("font-size:2rem")
                         ui.label("AI Visual Production").style(
-                            "color: #6B7280; font-size: 0.85rem; letter-spacing: 0.22em"
+                            f"color:{TEXT_MUTED}; font-size:0.85rem; letter-spacing:0.22em"
                         )
                 # Logout button
                 def logout():

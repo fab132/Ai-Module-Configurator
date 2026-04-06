@@ -2,6 +2,7 @@ import uuid
 from pathlib import Path
 from nicegui import ui, events
 from models.database import SessionLocal
+from models.entities import ClientPhoto
 from services import client_service
 
 PICS_DIR = Path("data/client_pics")
@@ -22,7 +23,7 @@ def create_client_view():
         with ui.row().classes("items-center justify-between mb-6"):
             ui.label("Client Profiles").classes("text-white font-bold").style("font-size: 1.4rem")
             ui.button("+ Add Client", on_click=lambda: open_add_dialog()).props(
-                "unelevated color=deep-purple"
+                "unelevated color=blue-6"
             )
 
         grid_container = ui.element("div").classes("w-full")
@@ -43,10 +44,28 @@ def create_client_view():
                         ui.label("Add your first client to start producing personalised content.").style("color: #6b7280; margin-top: 0.5rem")
                     return
 
+                TRAINING_CFG = {
+                    "none":     ("○ No Model",  "#6b7280"),
+                    "ready":    ("📸 Photos Ready", "#60A5FA"),
+                    "training": ("⏳ Training",  "#f59e0b"),
+                    "trained":  ("🧠 Model Ready", "#10b981"),
+                }
+
                 with ui.element("div").style(
                     "display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem"
                 ):
                     for c in clients:
+                        # fetch photo counts
+                        db_p = SessionLocal()
+                        try:
+                            face_n  = db_p.query(ClientPhoto).filter_by(client_id=c.id, category="face").count()
+                            body_n  = db_p.query(ClientPhoto).filter_by(client_id=c.id, category="body").count()
+                            style_n = db_p.query(ClientPhoto).filter_by(client_id=c.id, category="style").count()
+                        finally:
+                            db_p.close()
+
+                        ts_label, ts_color = TRAINING_CFG.get(c.training_status or "none", TRAINING_CFG["none"])
+
                         with ui.element("div").classes("param-card p-6 flex flex-col gap-3"):
                             with ui.row().classes("items-center gap-4"):
                                 ui.image(_avatar_url(c)).style(
@@ -57,12 +76,22 @@ def create_client_view():
                                     ui.label(c.name).classes("text-white font-bold").style("font-size: 1rem")
                                     if c.email:
                                         ui.label(c.email).style("color: #9ca3af; font-size: 0.8rem")
+                                    ui.element("span").style(
+                                        f"color:{ts_color};font-size:0.72rem;font-weight:600;letter-spacing:0.04em"
+                                    ).text = ts_label
+
+                            # Photo count summary
+                            with ui.row().classes("items-center gap-3"):
+                                for icon, count, tip in [("📸", face_n, "face"), ("👤", body_n, "body"), ("🎨", style_n, "style")]:
+                                    ui.label(f"{icon} {count}").style(
+                                        "color:#6b7280;font-size:0.78rem"
+                                    ).tooltip(f"{count} {tip} photos")
 
                             if c.lora_checkpoint:
                                 with ui.row().classes("items-center gap-2"):
                                     ui.label("🧠").style("font-size: 0.9rem")
                                     ui.label(c.lora_checkpoint).style(
-                                        "color: #a78bfa; font-size: 0.78rem; word-break: break-all"
+                                        "color: #60A5FA; font-size: 0.78rem; word-break: break-all"
                                     )
 
                             if c.prompt_prefix:
@@ -89,25 +118,25 @@ def create_client_view():
                                         ui.navigate.to(f"/client/{cid}")
                                     return do_open
 
-                                ui.button("View Profile", on_click=make_open(c.id)).props("unelevated color=deep-purple dense")
-                                ui.button("Edit", on_click=make_edit(c)).props("flat color=deep-purple-3 dense")
+                                ui.button("View Profile", on_click=make_open(c.id)).props("unelevated color=blue-6 dense")
+                                ui.button("Edit", on_click=make_edit(c)).props("flat color=blue-4 dense")
                                 ui.button("Delete", on_click=make_delete(c.id, c.name)).props("flat color=red dense")
 
         def _client_form_fields(dialog_card, existing=None):
             """Render form fields. Returns a getter function that returns field values."""
             with dialog_card:
-                f_name = ui.input("Full Name *", value=existing.name if existing else "").classes("w-full").props("outlined dark dense color=deep-purple-3")
-                f_email = ui.input("Email", value=existing.email or "" if existing else "").classes("w-full mt-3").props("outlined dark dense color=deep-purple-3")
+                f_name = ui.input("Full Name *", value=existing.name if existing else "").classes("w-full").props("outlined dark dense color=blue-4")
+                f_email = ui.input("Email", value=existing.email or "" if existing else "").classes("w-full mt-3").props("outlined dark dense color=blue-4")
                 f_lora = ui.input("LoRA Checkpoint path", value=existing.lora_checkpoint or "" if existing else "").classes("w-full mt-3").props(
-                    "outlined dark dense color=deep-purple-3"
+                    "outlined dark dense color=blue-4"
                 )
                 ui.label("e.g. models/lora/sarah_v1.safetensors").style("color: #6b7280; font-size: 0.75rem; margin-top: -0.5rem")
                 f_prefix = ui.input("Prompt Prefix", value=existing.prompt_prefix or "" if existing else "").classes("w-full mt-3").props(
-                    "outlined dark dense color=deep-purple-3"
+                    "outlined dark dense color=blue-4"
                 )
                 ui.label('e.g. "photo of sarah, woman, "').style("color: #6b7280; font-size: 0.75rem; margin-top: -0.5rem")
                 f_notes = ui.textarea("Notes", value=existing.notes or "" if existing else "").classes("w-full mt-3").props(
-                    "outlined dark dense color=deep-purple-3 rows=2"
+                    "outlined dark dense color=blue-4 rows=2"
                 )
 
                 pic_path_holder = {"path": existing.profile_picture if existing else None}
@@ -127,7 +156,7 @@ def create_client_view():
                     label="Upload photo",
                     max_file_size=5_000_000,
                     auto_upload=True,
-                ).props("accept=image/* flat color=deep-purple-3").classes("w-full")
+                ).props("accept=image/* flat color=blue-4").classes("w-full")
 
                 err = ui.label("").style("color: #f87171; font-size: 0.82rem; min-height: 1rem")
 
@@ -145,7 +174,7 @@ def create_client_view():
 
         def open_add_dialog():
             with ui.dialog() as dlg, ui.card().classes("w-full max-w-lg p-6").style(
-                "background: #13132b; border: 1px solid rgba(139,92,246,0.3); max-height: 90vh; overflow-y: auto"
+                "background: #1a1a3e; border: 1px solid #2d2d5e; max-height: 90vh; overflow-y: auto"
             ):
                 ui.label("Add New Client").classes("text-white font-bold mb-4").style("font-size: 1.2rem")
 
@@ -170,12 +199,12 @@ def create_client_view():
 
                 with ui.row().classes("mt-5 justify-end gap-3"):
                     ui.button("Cancel", on_click=dlg.close).props("flat color=grey")
-                    ui.button("Add Client", on_click=do_add).props("unelevated color=deep-purple")
+                    ui.button("Add Client", on_click=do_add).props("unelevated color=blue-6")
             dlg.open()
 
         def open_edit_dialog(existing_client):
             with ui.dialog() as dlg, ui.card().classes("w-full max-w-lg p-6").style(
-                "background: #13132b; border: 1px solid rgba(139,92,246,0.3); max-height: 90vh; overflow-y: auto"
+                "background: #1a1a3e; border: 1px solid #2d2d5e; max-height: 90vh; overflow-y: auto"
             ):
                 ui.label("Edit Client").classes("text-white font-bold mb-4").style("font-size: 1.2rem")
 
@@ -200,12 +229,12 @@ def create_client_view():
 
                 with ui.row().classes("mt-5 justify-end gap-3"):
                     ui.button("Cancel", on_click=dlg.close).props("flat color=grey")
-                    ui.button("Save Changes", on_click=do_edit).props("unelevated color=deep-purple")
+                    ui.button("Save Changes", on_click=do_edit).props("unelevated color=blue-6")
             dlg.open()
 
         def open_delete_dialog(cid, cname):
             with ui.dialog() as dlg, ui.card().classes("w-80 p-6").style(
-                "background: #13132b; border: 1px solid rgba(239,68,68,0.4)"
+                "background: #1a1a3e; border: 1px solid #EF4444"
             ):
                 ui.label("Delete Client?").classes("text-white font-bold mb-2").style("font-size: 1.1rem")
                 ui.label(f'"{cname}" and all their data will be permanently removed.').style("color: #9ca3af; font-size: 0.88rem")

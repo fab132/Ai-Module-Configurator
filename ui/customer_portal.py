@@ -5,6 +5,7 @@ from nicegui import ui, app, events
 from models.database import SessionLocal
 from models.entities import RunLog, Client, ClientPhoto
 from services import profile_service, client_service
+from ui.shared_styles import SHARED_CSS, AVATAR_PLACEHOLDER, COVER_GRADIENT, ACCENT_LOGO, TEXT_MUTED, BG_PAGE
 
 PICS_DIR = Path("data/profile_pics")
 COVERS_DIR = Path("data/profile_covers")
@@ -13,51 +14,12 @@ CLIENT_PICS_DIR = Path("data/client_pics")
 for d in [PICS_DIR, COVERS_DIR, REFS_DIR, CLIENT_PICS_DIR]:
     d.mkdir(parents=True, exist_ok=True)
 
-AVATAR_PLACEHOLDER = "https://ui-avatars.com/api/?background=7c3aed&color=fff&size=256&bold=true&name="
-COVER_GRADIENT = "linear-gradient(135deg, #12022f 0%, #1e1b4b 45%, #4c1d95 100%)"
-
 PHOTO_CATEGORIES = [
     ("face",  "📸  Face Reference",  "Front face, 3/4 angle, profile — essential for face consistency"),
     ("body",  "👤  Body Reference",  "Full body, half body shots — used for pose and outfit generation"),
     ("style", "🎨  Style Reference", "Outfit inspiration, mood boards — defines your aesthetic"),
 ]
 
-PORTAL_CSS = """
-    body, .q-page { background: #0a0a14 !important; }
-    .param-card {
-        background: linear-gradient(135deg, #13132b 0%, #1a1a35 100%);
-        border: 1px solid rgba(139,92,246,0.25);
-        border-radius: 18px;
-        transition: all 0.2s ease;
-    }
-    .aivp-header {
-        background: linear-gradient(135deg, #12022f 0%, #0a0a14 100%);
-        border-bottom: 1px solid rgba(139,92,246,0.25);
-    }
-    .cover-wrap { position: relative; }
-    .avatar-ring {
-        position: absolute; bottom: -52px; left: 40px;
-        width: 108px; height: 108px; border-radius: 50%;
-        border: 4px solid #0a0a14; overflow: hidden;
-        box-shadow: 0 0 0 3px rgba(139,92,246,0.55), 0 8px 28px rgba(124,58,237,0.35);
-        background: #1a1a35;
-    }
-    .photo-thumb {
-        position: relative; border-radius: 12px; overflow: hidden;
-        border: 1px solid rgba(139,92,246,0.2); transition: all 0.2s;
-    }
-    .photo-thumb:hover { border-color: rgba(139,92,246,0.65); }
-    .photo-del {
-        position: absolute; top: 4px; right: 4px;
-        background: rgba(239,68,68,0.85); border-radius: 6px;
-        padding: 2px 7px; font-size: 0.72rem; color: white;
-        cursor: pointer; opacity: 0; transition: opacity 0.2s;
-    }
-    .photo-thumb:hover .photo-del { opacity: 1; }
-    .q-tab--active .q-tab__label { color: #a78bfa !important; font-size: 0.95rem !important; }
-    .q-tab__label { font-size: 0.95rem !important; }
-    .q-tabs__content, .q-tab-panels { background: transparent !important; }
-"""
 
 
 def _avatar_url(profile, email, client=None) -> str:
@@ -88,16 +50,16 @@ def create_customer_portal():
             pass
 
         ui.dark_mode().enable()
-        ui.add_css(PORTAL_CSS)
+        ui.add_css(SHARED_CSS)
 
         # ── Header ──────────────────────────────────────────────────────────
         with ui.element("div").classes("aivp-header w-full px-10 py-5"):
             with ui.row().classes("items-center justify-between"):
                 with ui.row().classes("items-center gap-4"):
-                    ui.label("⚡").style("font-size:2rem")
+                    ui.label("⚡").style(f"font-size:2rem; color:{ACCENT_LOGO}")
                     with ui.column().classes("gap-0"):
                         ui.label("AIVP").classes("text-white font-black tracking-widest").style("font-size:1.6rem")
-                        ui.label("Customer Portal").style("color:#a78bfa; font-size:0.8rem; letter-spacing:0.18em")
+                        ui.label("Customer Portal").style(f"color:{TEXT_MUTED}; font-size:0.8rem; letter-spacing:0.18em")
                 def logout():
                     app.storage.user['authenticated'] = False
                     ui.navigate.to("/login")
@@ -452,13 +414,27 @@ def create_customer_portal():
                                     ui.label("Once our team produces content for you, it will appear here.").style("color:#6b7280;font-size:0.86rem;margin-top:4px")
                                 return
 
+                            STATUS_STYLE = {
+                                "pending":     ("🕐 Pending",     "#6b7280", "#1f2937"),
+                                "in_progress": ("⚙️ In Progress", "#f59e0b", "#292213"),
+                                "done":        ("✅ Done",         "#10b981", "#0d2117"),
+                            }
+
                             for log in logs:
                                 try:
                                     meta = json.loads(log.config_json).get("_meta", {})
                                 except Exception:
                                     meta = {}
-                                with ui.element("div").classes("param-card p-5 mb-3"):
-                                    with ui.row().classes("items-center justify-between"):
+
+                                s_label, s_color, s_bg = STATUS_STYLE.get(
+                                    log.status, STATUS_STYLE["pending"]
+                                )
+                                border_color = s_color
+
+                                with ui.element("div").classes("param-card p-5 mb-3").style(
+                                    f"border-left: 4px solid {border_color};"
+                                ):
+                                    with ui.row().classes("items-center justify-between mb-2 flex-wrap gap-2"):
                                         with ui.row().classes("gap-3 flex-wrap"):
                                             for k, v in [
                                                 ("Platform", meta.get("platform")),
@@ -469,8 +445,30 @@ def create_customer_portal():
                                             ]:
                                                 if v:
                                                     ui.badge(f"{k}: {v}").props("color=deep-purple-9 text-color=white")
-                                        ui.label(
-                                            log.ran_at.strftime("%d %b %Y  %H:%M") if log.ran_at else "—"
-                                        ).style("color:#6b7280;font-size:0.8rem;flex-shrink:0")
+
+                                        with ui.row().classes("items-center gap-3 flex-shrink-0"):
+                                            ui.element("span").style(
+                                                f"background:{s_bg};color:{s_color};border:1px solid {s_color};"
+                                                "border-radius:99px;padding:3px 12px;font-size:0.75rem;font-weight:700;"
+                                                "letter-spacing:0.05em;"
+                                            ).text = s_label
+                                            ui.label(
+                                                log.ran_at.strftime("%d %b %Y  %H:%M") if log.ran_at else "—"
+                                            ).style("color:#6b7280;font-size:0.8rem")
+
+                                    if log.operator_notes:
+                                        ui.label(f"📝 {log.operator_notes}").style(
+                                            "color:#9ca3af;font-size:0.8rem;font-style:italic;margin-top:0.3rem"
+                                        )
+
+                                    if log.output_file and Path(log.output_file).exists():
+                                        output_name = Path(log.output_file).name
+                                        with ui.row().classes("items-center gap-3 mt-3"):
+                                            ui.label("🎬 Your production is ready!").style(
+                                                "color:#10b981;font-size:0.88rem;font-weight:600"
+                                            )
+                                            ui.button(
+                                                "⬇️  Download", on_click=lambda p=f"/outputs/{output_name}": ui.navigate.to(p, new_tab=True)
+                                            ).props("unelevated color=green-8 dense")
 
                     load_productions()

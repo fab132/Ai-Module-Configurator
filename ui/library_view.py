@@ -32,12 +32,12 @@ def create_library_view():
                             def make_edit(model_id, model_name, model_cat, model_path):
                                 def do_edit():
                                     with ui.dialog() as dlg, ui.card().classes("w-96 p-6").style(
-                                        "background: #13132b; border: 1px solid rgba(139,92,246,0.3)"
+                                        "background: #1a1a3e; border: 1px solid #2d2d5e"
                                     ):
                                         ui.label("Edit LoRA Model").classes("text-white font-bold mb-4 text-lg")
-                                        e_name = ui.input("Name", value=model_name).classes("w-full").props("outlined dark dense color=deep-purple-3")
-                                        e_cat = ui.input("Category", value=model_cat).classes("w-full mt-3").props("outlined dark dense color=deep-purple-3")
-                                        e_path = ui.input("File Path", value=model_path).classes("w-full mt-3").props("outlined dark dense color=deep-purple-3")
+                                        e_name = ui.input("Name", value=model_name).classes("w-full").props("outlined dark dense color=blue-4")
+                                        e_cat = ui.input("Category", value=model_cat).classes("w-full mt-3").props("outlined dark dense color=blue-4")
+                                        e_path = ui.input("File Path", value=model_path).classes("w-full mt-3").props("outlined dark dense color=blue-4")
                                         err = ui.label("").style("color: #f87171; font-size: 0.82rem; min-height: 1.1rem")
 
                                         def save_edit():
@@ -57,14 +57,14 @@ def create_library_view():
 
                                         with ui.row().classes("mt-5 justify-end gap-3"):
                                             ui.button("Cancel", on_click=dlg.close).props("flat color=grey")
-                                            ui.button("Save", on_click=save_edit).props("unelevated color=deep-purple")
+                                            ui.button("Save", on_click=save_edit).props("unelevated color=blue-6")
                                     dlg.open()
                                 return do_edit
 
                             def make_delete(model_id, model_name):
                                 def do_delete():
                                     with ui.dialog() as dlg, ui.card().classes("w-80 p-6").style(
-                                        "background: #13132b; border: 1px solid rgba(239,68,68,0.4)"
+                                        "background: #1a1a3e; border: 1px solid #EF4444"
                                     ):
                                         ui.label("Delete LoRA Model?").classes("text-white font-bold mb-2 text-lg")
                                         ui.label(f'"{model_name}" will be permanently removed.').style("color: #9ca3af; font-size: 0.9rem")
@@ -94,9 +94,9 @@ def create_library_view():
         with ui.element("div").classes("param-card p-6"):
             ui.label("Add New LoRA Model").classes("text-white font-semibold mb-4 block").style("font-size: 1rem")
             with ui.row().classes("gap-4 items-end w-full"):
-                n_name = ui.input("Name").classes("flex-1").props("outlined dark dense color=deep-purple-3")
-                n_cat = ui.input("Category").classes("flex-1").props("outlined dark dense color=deep-purple-3")
-                n_path = ui.input("File Path").classes("flex-1").props("outlined dark dense color=deep-purple-3")
+                n_name = ui.input("Name").classes("flex-1").props("outlined dark dense color=blue-4")
+                n_cat = ui.input("Category").classes("flex-1").props("outlined dark dense color=blue-4")
+                n_path = ui.input("File Path").classes("flex-1").props("outlined dark dense color=blue-4")
                 add_err = ui.label("").style("color: #f87171; font-size: 0.82rem")
 
             def add_model():
