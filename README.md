@@ -53,7 +53,7 @@ As a returning user, I want to log in with my email and password so I can access
 
 #### 3. Configure Run
 
-As an operator, I want to select a persona and content parameters from dropdowns so I can configure a run without editing JSON manually.
+As an user, I want to select a persona and content parameters from dropdowns so I can configure a run without editing JSON manually.
 
 - **Inputs:** 8 parameter selections (`Person`, `Content-Type`, `Platform`, `Format`, `Scenery`, `Outfit`, `Lighting`, `Perspective`)
 - **Outputs:** merged ComfyUI workflow JSON, run confirmation
@@ -62,7 +62,7 @@ As an operator, I want to select a persona and content parameters from dropdowns
 
 #### 4. Trigger Run
 
-As an operator, I want to click **Run** and have the workflow sent to ComfyUI automatically.
+As an user, I want to click **Run** and have the workflow sent to ComfyUI automatically.
 
 - **Inputs:** validated workflow JSON
 - **Outputs:** ComfyUI API response, `RunLog` entry with timestamp
@@ -71,7 +71,7 @@ As an operator, I want to click **Run** and have the workflow sent to ComfyUI au
 
 #### 5. Select Output Format
 
-As an operator, I want to choose the output format of the generated image (e.g. resolution, aspect ratio) so the result fits the target platform requirements.
+As an user, I want to choose the output format of the generated image (e.g. resolution, aspect ratio) so the result fits the target platform requirements.
 
 - **Inputs:** resolution (`str`), aspect ratio (`str`)
 - **Outputs:** format parameters applied to the workflow config
@@ -80,7 +80,7 @@ As an operator, I want to choose the output format of the generated image (e.g. 
 
 #### 6. Save / Download Output
 
-As an operator, I want to download the generated output directly to my device or save it to cloud storage so I can use it in my workflow.
+As an user, I want to download the generated output directly to my device or save it to cloud storage so I can use it in my workflow.
 
 - **Inputs:** generated output file, delivery choice (`local` | `cloud`)
 - **Outputs:** downloaded file or cloud storage confirmation
@@ -89,7 +89,7 @@ As an operator, I want to download the generated output directly to my device or
 
 #### 7. Save Combo Template
 
-As an operator, I want to save a parameter combination as a Combo Template so I can reuse it for repeat customers.
+As an user, I want to save a parameter combination as a Combo Template so I can reuse it for repeat customers.
 
 - **Inputs:** combo name (`str`), current 8-parameter selection
 - **Outputs:** saved `Combo` record in DB
@@ -98,7 +98,7 @@ As an operator, I want to save a parameter combination as a Combo Template so I 
 
 #### 8. View Run History
 
-As an operator, I want to see a history of all past runs with their settings and timestamps so I can track and reproduce previous productions.
+As an user, I want to see a history of all past runs with their settings and timestamps so I can track and reproduce previous productions.
 
 - **Inputs:** none (optional: filter by date or customer)
 - **Outputs:** list of `RunLog` entries (`list[RunLog]`)
@@ -147,20 +147,19 @@ As an admin, I want to add, edit, and delete client profiles so each person's tr
 
 **Use Cases**
 - Register / Login (User) — create an account with email and password, or log in for returning access
-- Configure Run (Operator) — select 8 parameters and trigger workflow
+- Configure Run (User) — select 8 parameters and trigger workflow
 - Select Output Format (Operator) — choose resolution and aspect ratio before triggering a run
-- Save / Download Output (Operator) — download generated image to device or save to cloud storage
-- Save Combo Template (Operator) — store a named parameter set
-- Load Combo Template (Operator) — apply a saved set to the form
-- View Run History (Operator) — browse past runs with settings and timestamps
+- Save / Download Output (User) — download generated image to device or save to cloud storage
+- Save Combo Template (User) — store a named parameter set
+- Load Combo Template (User) — apply a saved set to the form
+- View Run History (User) — browse past runs with settings and timestamps
 - Add LoRA Model (Admin) — add a new model entry to the library
 - Edit LoRA Model (Admin) — update metadata of an existing model entry
 - Delete LoRA Model (Admin) — remove an outdated or unused model from the library
 - Manage Clients (Admin) — add/edit/delete client profiles with LoRA model path, prompt prefix, and profile picture
 
 **Actors**
-- User (registers and logs in)
-- Operator (configures and triggers runs, manages output)
+- User (registers, logs in, configures, triggers runs and manages output)
 - Admin (manages LoRA model library and client profiles)
 
 ---
